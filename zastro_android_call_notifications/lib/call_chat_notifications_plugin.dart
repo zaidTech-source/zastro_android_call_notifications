@@ -5,7 +5,7 @@ import 'package:android_intent_plus/flag.dart';
 import 'package:flutter/foundation.dart';
 
 class ChatNotificationPlugin {
-  static const MethodChannel _channel = MethodChannel('chat_notifications');
+  static const MethodChannel _channel = MethodChannel('Chat notifications');
 
   static Future<void> showCallNotification(Map<String, dynamic> data) async {
     try {
