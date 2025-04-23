@@ -141,10 +141,9 @@ class ZastroAndroidCallNotificationsPlugin : FlutterPlugin, MethodCallHandler, A
             .toInt()
 
           if (notificationId != -1 && notificationId > 0) {
-            var stopIntent = Intent(context, CallNotificationService::class.java).apply {
-              action = "ACTION_CANCEL_CALL_NOTIFICATION"
-              putExtra("notificationId", notificationId)
-            }
+            val stopIntent = Intent(context, CallNotificationService::class.java)
+            stopIntent.action = "ACTION_CANCEL_CALL_NOTIFICATION"
+            stopIntent.putExtra("notificationId", notificationId)
             context.stopService(stopIntent)
           }
         } catch (e: Exception) {
