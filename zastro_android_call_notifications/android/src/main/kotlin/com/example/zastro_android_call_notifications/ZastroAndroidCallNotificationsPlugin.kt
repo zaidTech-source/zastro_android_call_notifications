@@ -8,8 +8,8 @@ import android.os.Build
 import android.os.Bundle
 import android.util.Log
 import androidx.annotation.NonNull
-import com.zastro.callnotifications.services.CallNotificationService
-import com.zastro.callnotifications.utils.MethodChannelHelper
+import com.example.zastro_android_call_notifications.CallNotificationService
+import com.example.zastro_android_call_notifications.MethodChannelHelper
 import io.flutter.embedding.engine.plugins.FlutterPlugin
 import io.flutter.embedding.engine.plugins.activity.ActivityAware
 import io.flutter.embedding.engine.plugins.activity.ActivityPluginBinding
@@ -141,7 +141,7 @@ class ZastroAndroidCallNotificationsPlugin : FlutterPlugin, MethodCallHandler, A
             .toInt()
 
           if (notificationId != -1 && notificationId > 0) {
-            val stopIntent = Intent(context, CallNotificationService::class.java).apply {
+            var stopIntent = Intent(context, CallNotificationService::class.java).apply {
               action = "ACTION_CANCEL_CALL_NOTIFICATION"
               putExtra("notificationId", notificationId)
             }
