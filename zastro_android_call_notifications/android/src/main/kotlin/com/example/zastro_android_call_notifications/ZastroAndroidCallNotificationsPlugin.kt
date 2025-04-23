@@ -1,0 +1,169 @@
+package com.example.zastro_android_call_notifications
+
+import android.app.Activity
+import android.app.NotificationManager
+import android.content.Context
+import android.content.Intent
+import android.os.Build
+import android.os.Bundle
+import android.util.Log
+import androidx.annotation.NonNull
+import com.zastro.callnotifications.services.CallNotificationService
+import com.zastro.callnotifications.utils.MethodChannelHelper
+import io.flutter.embedding.engine.plugins.FlutterPlugin
+import io.flutter.embedding.engine.plugins.activity.ActivityAware
+import io.flutter.embedding.engine.plugins.activity.ActivityPluginBinding
+import io.flutter.plugin.common.MethodCall
+import io.flutter.plugin.common.MethodChannel
+import io.flutter.plugin.common.MethodChannel.MethodCallHandler
+import io.flutter.plugin.common.MethodChannel.Result
+import org.json.JSONObject
+
+class ZastroAndroidCallNotificationsPlugin : FlutterPlugin, MethodCallHandler, ActivityAware {
+  private lateinit var context: Context
+  private lateinit var channel: MethodChannel
+  private lateinit var callTimerChannel: MethodChannel
+  private var activity: Activity? = null
+  private var latestNotificationData: Map<String, Any?>? = null
+
+  override fun onAttachedToEngine(@NonNull binding: FlutterPlugin.FlutterPluginBinding) {
+    context = binding.applicationContext
+    channel = MethodChannel(binding.binaryMessenger, "Chat notifications")
+    callTimerChannel = MethodChannel(binding.binaryMessenger, "Call Timer")
+    channel.setMethodCallHandler(this)
+    MethodChannelHelper.setMethodChannel(channel)
+  }
+
+  override fun onMethodCall(@NonNull call: MethodCall, @NonNull result: Result) {
+    try {
+      when (call.method) {
+        "showCallNotification" -> {
+          val type = call.argument<String>("type") ?: ""
+          val uniqueId = call.argument<String>("uniqueId") ?: ""
+          val customerUniId = call.argument<String>("customerUniId") ?: ""
+          val notificationId = call.argument<Int>("notificationId") ?: 1001
+          val callerName = call.argument<String>("caller_name") ?: "Unknown Caller"
+          val callerImage = call.argument<String>("caller_image") ?: ""
+          val messageDataInString = call.argument<String>("message_data_in_string") ?: "{}"
+
+          startCallNotificationService(
+            type,
+            uniqueId,
+            customerUniId,
+            notificationId,
+            callerName,
+            callerImage,
+            messageDataInString
+          )
+          result.success("Call notification started")
+        }
+
+        "cancelCallNotification" -> {
+          val notificationId = call.argument<Int>("notificationId") ?: -1
+          val intent = Intent(context, CallNotificationService::class.java).apply {
+            action = "ACTION_CANCEL_CALL_NOTIFICATION"
+            putExtra("notificationId", notificationId)
+          }
+          context.startService(intent)
+          result.success(null)
+        }
+
+        "notificationData" -> {
+          if (latestNotificationData != null) {
+            result.success(latestNotificationData)
+          } else {
+            result.error("NO_DATA", "No notification data available", null)
+          }
+        }
+
+        "onCallAction" -> {
+          val data = call.arguments as? Map<String, Any?> ?: emptyMap()
+          Log.d("ZastroPlugin", "Flutter sent data: $data")
+          result.success("Data received successfully!")
+        }
+
+        else -> result.notImplemented()
+      }
+    } catch (e: Exception) {
+      result.error("ERROR", e.localizedMessage, null)
+    }
+  }
+
+  private fun startCallNotificationService(
+    type: String,
+    uniqueId: String,
+    customerUniId: String,
+    notificationId: Int,
+    callerName: String,
+    callerImage: String,
+    messageDataInString: String,
+  ) {
+    val intent = Intent(context, CallNotificationService::class.java).apply {
+      putExtra("type", type)
+      putExtra("uniqueId", uniqueId)
+      putExtra("customerUniId", customerUniId)
+      putExtra("notificationId", notificationId)
+      putExtra("caller_name", callerName)
+      putExtra("caller_image", callerImage)
+      putExtra("message_data_in_string", messageDataInString)
+    }
+    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+      context.startForegroundService(intent)
+    } else {
+      context.startService(intent)
+    }
+  }
+
+  override fun onAttachedToActivity(binding: ActivityPluginBinding) {
+    activity = binding.activity
+    binding.addOnNewIntentListener { intent ->
+      handleIntent(intent)
+      true
+    }
+    handleIntent(binding.activity.intent)
+  }
+
+  private fun handleIntent(intent: Intent?) {
+    intent?.extras?.let { extras ->
+      latestNotificationData = extras.keySet().associateWith { key -> extras.get(key) }
+
+      val action = extras.getString("key", "") ?: return
+      if (action == "ACTION_ANSWER_CALL" || action == "ACTION_DECLINE_CALL" || action == "CALL_NOTIFICATION_CLICK") {
+        try {
+          val messageData = extras.getString("message_data_in_string", "")
+          val notificationId = JSONObject(messageData ?: "{}")
+            .optString("notification_id", "-1")
+            .toInt()
+
+          if (notificationId != -1 && notificationId > 0) {
+            val stopIntent = Intent(context, CallNotificationService::class.java).apply {
+              action = "ACTION_CANCEL_CALL_NOTIFICATION"
+              putExtra("notificationId", notificationId)
+            }
+            context.stopService(stopIntent)
+          }
+        } catch (e: Exception) {
+          Log.e("ZastroPlugin", "Error parsing notification ID", e)
+        }
+      }
+    }
+  }
+
+  override fun onDetachedFromActivity() {
+    activity = null
+  }
+
+  override fun onReattachedToActivityForConfigChanges(binding: ActivityPluginBinding) {
+    onAttachedToActivity(binding)
+  }
+
+  override fun onDetachedFromActivityForConfigChanges() {
+    activity = null
+  }
+
+  override fun onDetachedFromEngine(@NonNull binding: FlutterPlugin.FlutterPluginBinding) {
+    channel.setMethodCallHandler(null)
+    callTimerChannel.setMethodCallHandler(null)
+    MethodChannelHelper.dispose()
+  }
+}
