@@ -56,6 +56,7 @@ class CallNotificationService : Service() {
         const val ACTION_ANSWER_CALL = "ACTION_ANSWER_CALL"
         const val ACTION_DECLINE_CALL = "ACTION_DECLINE_CALL"
         const val CALL_NOTIFICATION_CLICK = "CALL_NOTIFICATION_CLICK"
+        const val NOTIFICATION_ICON_RES_ID = "notification_icon_res_id"
     }
 
     private var flutterEngine: FlutterEngine? = null

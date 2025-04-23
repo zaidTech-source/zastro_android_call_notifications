@@ -121,7 +121,7 @@ class CallTimerService : Service() {
         return NotificationCompat.Builder(this, CALL_TIMER_CHANNEL_ID)
             .setContentTitle("Ongoing Call")
             .setContentText("Call Duration: ${formatTime(seconds)}")
-            .setSmallIcon(R.drawable.ic_notification)
+            .setSmallIcon(R.drawable.ic_ongoing_call)
             .setCategory(NotificationCompat.CATEGORY_CALL)
             .setPriority(NotificationCompat.PRIORITY_HIGH)
             .setVisibility(NotificationCompat.VISIBILITY_PUBLIC)

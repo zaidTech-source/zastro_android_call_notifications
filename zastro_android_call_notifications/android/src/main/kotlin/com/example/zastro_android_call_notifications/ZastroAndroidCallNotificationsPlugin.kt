@@ -37,6 +37,11 @@ class ZastroAndroidCallNotificationsPlugin : FlutterPlugin, MethodCallHandler, A
   override fun onMethodCall(@NonNull call: MethodCall, @NonNull result: Result) {
     try {
       when (call.method) {
+        "initialize" -> {
+          Log.d("ZastroPlugin", "Plugin Initialized")
+          result.success("Initialization successful")
+        }
+
         "showCallNotification" -> {
           val type = call.argument<String>("type") ?: ""
           val uniqueId = call.argument<String>("uniqueId") ?: ""
