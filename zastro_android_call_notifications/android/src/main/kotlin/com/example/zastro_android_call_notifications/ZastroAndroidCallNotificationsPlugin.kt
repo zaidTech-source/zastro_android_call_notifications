@@ -143,7 +143,7 @@ class ZastroAndroidCallNotificationsPlugin : FlutterPlugin, MethodCallHandler, A
       addAction("com.example.zastro_android_call_notifications.CANCEL_CALL_NOTIFICATION")
     }
     if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-      context.registerReceiver(callReceiver, callFilter, Context.RECEIVER_NOT_EXPORTED)
+      context.registerReceiver(callReceiver, callFilter, Context.RECEIVER_EXPORTED)
     } else {
       @Suppress("DEPRECATION")
       context.registerReceiver(callReceiver, callFilter)
