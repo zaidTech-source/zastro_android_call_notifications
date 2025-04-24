@@ -29,6 +29,9 @@ class ZastroAndroidCallNotificationsPlugin : FlutterPlugin, MethodCallHandler, A
   private lateinit var context: Context
   private lateinit var channel: MethodChannel
   private lateinit var callTimerChannel: MethodChannel
+  private lateinit var callReceiver: CallReceiver
+  private lateinit var callActionReceiver: CallActionReceiver
+  private lateinit var callOngoingReceiver: CallOngoingTimeNotificationReceiver
   private var activity: Activity? = null
   private var latestNotificationData: Map<String, Any?>? = null
 
