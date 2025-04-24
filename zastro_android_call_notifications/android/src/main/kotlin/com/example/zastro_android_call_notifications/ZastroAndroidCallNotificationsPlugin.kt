@@ -51,6 +51,22 @@ class ZastroAndroidCallNotificationsPlugin : FlutterPlugin, MethodCallHandler, A
           result.success("Initialization successful")
         }
 
+        "triggerBroadcastNotification" -> {
+          val data = call.arguments as Map<String, Any?>?
+          // Prepare the data you need for your broadcast
+          val messageData = data?.get("message_data_in_string") as String
+
+          // Create and send the broadcast intent
+          val intent = Intent("com.example.zastro_android_call_notifications.SHOW_CALL_NOTIFICATION").apply {
+            putExtra("message_data_in_string", messageData)
+          }
+
+          // Send broadcast
+          context.sendBroadcast(intent)
+
+          result.success("Broadcast sent successfully!")
+        }
+
         "showCallNotification" -> {
           val type = call.argument<String>("type") ?: ""
           val uniqueId = call.argument<String>("uniqueId") ?: ""
@@ -157,7 +173,7 @@ class ZastroAndroidCallNotificationsPlugin : FlutterPlugin, MethodCallHandler, A
       addAction("ACTION_DECLINE_CALL")
     }
     if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-      context.registerReceiver(callActionReceiver, actionFilter, Context.RECEIVER_NOT_EXPORTED)
+      context.registerReceiver(callActionReceiver, actionFilter, Context.RECEIVER_EXPORTED)
     } else {
       @Suppress("DEPRECATION")
       context.registerReceiver(callActionReceiver, actionFilter)
@@ -172,7 +188,7 @@ class ZastroAndroidCallNotificationsPlugin : FlutterPlugin, MethodCallHandler, A
       addAction("com.example.zastro_android_call_notifications.STOP_MIC_NOTIFICATION")
     }
     if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-      context.registerReceiver(callOngoingReceiver, ongoingFilter, Context.RECEIVER_NOT_EXPORTED)
+      context.registerReceiver(callOngoingReceiver, ongoingFilter, Context.RECEIVER_EXPORTED)
     } else {
       @Suppress("DEPRECATION")
       context.registerReceiver(callOngoingReceiver, ongoingFilter)
