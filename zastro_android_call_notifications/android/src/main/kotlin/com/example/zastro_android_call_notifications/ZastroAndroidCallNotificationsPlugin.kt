@@ -126,6 +126,32 @@ class ZastroAndroidCallNotificationsPlugin : FlutterPlugin, MethodCallHandler, A
       true
     }
     handleIntent(binding.activity.intent)
+
+    // Register all broadcast receivers
+    callReceiver = CallReceiver()
+    val callFilter = IntentFilter().apply {
+      addAction("com.example.zastro_android_call_notifications.SHOW_CALL_NOTIFICATION")
+      addAction("com.example.zastro_android_call_notifications.CANCEL_CALL_NOTIFICATION")
+    }
+    context.registerReceiver(callReceiver, callFilter)
+
+    callActionReceiver = CallActionReceiver()
+    val actionFilter = IntentFilter().apply {
+      addAction("CALL_NOTIFICATION_CLICK")
+      addAction("ACTION_ANSWER_CALL")
+      addAction("ACTION_DECLINE_CALL")
+    }
+    context.registerReceiver(callActionReceiver, actionFilter)
+
+    callOngoingReceiver = CallOngoingTimeNotificationReceiver()
+    val ongoingFilter = IntentFilter().apply {
+      addAction("com.example.zastro_android_call_notifications.START_CALL_NOTIFICATION")
+      addAction("com.example.zastro_android_call_notifications.START_MICROPHONE_NOTIFICATION")
+      addAction("com.example.zastro_android_call_notifications.UPDATE_CALL_NOTIFICATION")
+      addAction("com.example.zastro_android_call_notifications.STOP_CALL_NOTIFICATION")
+      addAction("com.example.zastro_android_call_notifications.STOP_MIC_NOTIFICATION")
+    }
+    context.registerReceiver(callOngoingReceiver, ongoingFilter)
   }
 
   private fun handleIntent(intent: Intent?) {
@@ -155,6 +181,22 @@ class ZastroAndroidCallNotificationsPlugin : FlutterPlugin, MethodCallHandler, A
 
   override fun onDetachedFromActivity() {
     activity = null
+
+    try {
+      context.unregisterReceiver(callReceiver)
+    } catch (e: Exception) {
+      Log.w("ZastroPlugin", "CallReceiver already unregistered or not registered: ${e.message}")
+    }
+    try {
+      context.unregisterReceiver(callActionReceiver)
+    } catch (e: Exception) {
+      Log.w("ZastroPlugin", "CallActionReceiver already unregistered or not registered: ${e.message}")
+    }
+    try {
+      context.unregisterReceiver(callOngoingReceiver)
+    } catch (e: Exception) {
+      Log.w("ZastroPlugin", "CallOngoingReceiver already unregistered or not registered: ${e.message}")
+    }
   }
 
   override fun onReattachedToActivityForConfigChanges(binding: ActivityPluginBinding) {
