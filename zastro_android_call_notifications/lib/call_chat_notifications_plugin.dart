@@ -67,6 +67,7 @@ class ChatNotificationPlugin {
 
   static Future<void> triggerBroadcastNotification(String messageDataJson) async {
     try {
+      print("🚀 Sending JSON to Kotlin: $messageDataJson");
       await _channel.invokeMethod('triggerBroadcastNotification', {'message_data_in_string': messageDataJson});
     } on PlatformException catch (e) {
       print("Error invoking triggerBroadcastNotification: ${e.message}");
