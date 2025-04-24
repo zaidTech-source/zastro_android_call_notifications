@@ -32,10 +32,10 @@ class ChatNotificationPlugin {
       final Map<String, dynamic> data = jsonDecode(messageDataJson);
       final String type = data['type'] ?? "alert";
 
-      if (type == "chat") {
+      if (["chat", "video", "call"].contains(type)) {
         final intent = AndroidIntent(
           action: "com.example.zastro_android_call_notifications.SHOW_CALL_NOTIFICATION",
-          package: "com.example.zastro_android_call_notifications",
+          // package: "com.example.zastro_android_call_notifications",
           arguments: {
             "message_data_in_string": messageDataJson,
           },
@@ -51,7 +51,7 @@ class ChatNotificationPlugin {
 
         final intent = AndroidIntent(
           action: "com.example.zastro_android_call_notifications.CANCEL_CALL_NOTIFICATION",
-          package: "com.example.zastro_android_call_notifications",
+          // package: "com.example.zastro_android_call_notifications",
           arguments: {
             "notificationId": notificationId,
           },
