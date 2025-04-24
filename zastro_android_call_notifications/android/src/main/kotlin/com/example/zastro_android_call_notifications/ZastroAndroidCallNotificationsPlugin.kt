@@ -142,7 +142,13 @@ class ZastroAndroidCallNotificationsPlugin : FlutterPlugin, MethodCallHandler, A
       addAction("com.example.zastro_android_call_notifications.SHOW_CALL_NOTIFICATION")
       addAction("com.example.zastro_android_call_notifications.CANCEL_CALL_NOTIFICATION")
     }
-    context.registerReceiver(callReceiver, callFilter)
+    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+      context.registerReceiver(callReceiver, callFilter, Context.RECEIVER_NOT_EXPORTED)
+    } else {
+      @Suppress("DEPRECATION")
+      context.registerReceiver(callReceiver, callFilter)
+    }
+
 
     callActionReceiver = CallActionReceiver()
     val actionFilter = IntentFilter().apply {
@@ -150,7 +156,12 @@ class ZastroAndroidCallNotificationsPlugin : FlutterPlugin, MethodCallHandler, A
       addAction("ACTION_ANSWER_CALL")
       addAction("ACTION_DECLINE_CALL")
     }
-    context.registerReceiver(callActionReceiver, actionFilter)
+    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+      context.registerReceiver(callActionReceiver, actionFilter, Context.RECEIVER_NOT_EXPORTED)
+    } else {
+      @Suppress("DEPRECATION")
+      context.registerReceiver(callActionReceiver, actionFilter)
+    }
 
     callOngoingReceiver = CallOngoingTimeNotificationReceiver()
     val ongoingFilter = IntentFilter().apply {
@@ -160,7 +171,12 @@ class ZastroAndroidCallNotificationsPlugin : FlutterPlugin, MethodCallHandler, A
       addAction("com.example.zastro_android_call_notifications.STOP_CALL_NOTIFICATION")
       addAction("com.example.zastro_android_call_notifications.STOP_MIC_NOTIFICATION")
     }
-    context.registerReceiver(callOngoingReceiver, ongoingFilter)
+    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+      context.registerReceiver(callOngoingReceiver, ongoingFilter, Context.RECEIVER_NOT_EXPORTED)
+    } else {
+      @Suppress("DEPRECATION")
+      context.registerReceiver(callOngoingReceiver, ongoingFilter)
+    }
   }
 
   private fun handleIntent(intent: Intent?) {
