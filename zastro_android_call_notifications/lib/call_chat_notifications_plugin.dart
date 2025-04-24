@@ -65,9 +65,9 @@ class ChatNotificationPlugin {
   //   }
   // }
 
-  static Future<void> triggerBroadcastNotification(Map<String, dynamic> data) async {
+  static Future<void> triggerBroadcastNotification(String messageDataJson) async {
     try {
-      await _channel.invokeMethod('triggerBroadcastNotification', data);
+      await _channel.invokeMethod('triggerBroadcastNotification', {'message_data_in_string': messageDataJson});
     } on PlatformException catch (e) {
       print("Error invoking triggerBroadcastNotification: ${e.message}");
     }
