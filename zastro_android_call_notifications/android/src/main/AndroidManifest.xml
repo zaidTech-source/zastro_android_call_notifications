@@ -34,6 +34,7 @@
 
         <receiver
             android:name=".CallReceiver"
+            android:enabled="true"
             android:exported="true">
             <intent-filter>
                 <action android:name="com.example.zastro_android_call_notifications.SHOW_CALL_NOTIFICATION" />
@@ -57,7 +58,8 @@
 
         <receiver
             android:name=".CallOngoingTimeNotificationReceiver"
-            android:exported="false">
+            android:enabled="true"
+            android:exported="true">
             <intent-filter>
                 <action android:name="com.example.zastro_android_call_notifications.START_CALL_NOTIFICATION" />
                 <action android:name="com.example.zastro_android_call_notifications.START_MICROPHONE_NOTIFICATION" />
