@@ -58,7 +58,7 @@ class ZastroAndroidCallNotificationsPlugin : FlutterPlugin, MethodCallHandler, A
           Log.d("ZastroPlugin", "📦 Received JSON string: $messageData")
           println("📨 Received: $messageData")
           try {
-            val intent = Intent("${applicationId}.com.example.zastro_android_call_notifications.SHOW_CALL_NOTIFICATION").apply {
+            val intent = Intent("${context.packageName}.com.example.zastro_android_call_notifications.SHOW_CALL_NOTIFICATION").apply {
               putExtra("message_data_in_string", messageData)
             }
 

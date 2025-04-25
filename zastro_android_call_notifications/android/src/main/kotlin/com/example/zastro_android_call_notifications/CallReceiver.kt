@@ -12,7 +12,7 @@ class CallReceiver : BroadcastReceiver() {
     override fun onReceive(context: Context, intent: Intent) {
         Log.d("CallReceiver", "Received broadcast for action: ${intent?.action}")
         println("📨 CallReceiver: ${intent?.action}")
-        if (intent.action == "${applicationId}.com.example.zastro_android_call_notifications.SHOW_CALL_NOTIFICATION") {
+        if (intent.action == "${context.packageName}.com.example.zastro_android_call_notifications.SHOW_CALL_NOTIFICATION") {
             val messageDataJsonString = intent.getStringExtra("message_data_in_string")
             val messageData: JSONObject? = messageDataJsonString?.let {
                 try {
@@ -44,7 +44,7 @@ class CallReceiver : BroadcastReceiver() {
                 context.startService(serviceIntent)
             }
         }
-        else if (intent.action == "${applicationId}.com.example.zastro_android_call_notifications.CANCEL_CALL_NOTIFICATION") {
+        else if (intent.action == "${context.packageName}.com.example.zastro_android_call_notifications.CANCEL_CALL_NOTIFICATION") {
             val notificationId = intent.getIntExtra("notificationId", -1)
             if (notificationId != -1) {
                 val serviceIntent =
