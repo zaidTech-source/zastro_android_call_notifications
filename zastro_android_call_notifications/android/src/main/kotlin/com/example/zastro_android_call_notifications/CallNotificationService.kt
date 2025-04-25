@@ -321,7 +321,6 @@ class CallNotificationService : Service() {
         }
 
         if (focusResult == AudioManager.AUDIOFOCUS_REQUEST_GRANTED) {
-            stopSystemRingtone(audioManager)
             mediaPlayer = MediaPlayer().apply {
                 setAudioAttributes(
                     AudioAttributes.Builder()
@@ -364,18 +363,6 @@ class CallNotificationService : Service() {
         mediaPlayer?.stop()
         mediaPlayer?.release()
         mediaPlayer = null
-    }
-
-    private fun stopSystemRingtone(audioManager: AudioManager) {
-
-        val previousVolume = audioManager.getStreamVolume(AudioManager.STREAM_RING)
-
-        audioManager.setStreamVolume(AudioManager.STREAM_RING, 0, AudioManager.FLAG_PLAY_SOUND)
-
-        GlobalScope.launch(Dispatchers.Main) {
-            delay(500)
-            audioManager.setStreamVolume(AudioManager.STREAM_RING, previousVolume, AudioManager.FLAG_PLAY_SOUND)
-        }
     }
 
     private fun stopVibration() {
