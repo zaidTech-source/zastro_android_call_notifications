@@ -16,7 +16,7 @@ class CallOngoingTimeNotificationReceiver : BroadcastReceiver() {
         if (context == null || intent == null) return
 
         when (intent.action) {
-            "com.example.zastro_android_call_notifications.START_CALL_NOTIFICATION" -> {
+            "${applicationId}.com.example.zastro_android_call_notifications.START_CALL_NOTIFICATION" -> {
                 if (CallTimerService.instance?.isRunning != true) {
                     val serviceIntent = Intent(context, CallTimerService::class.java)
                 serviceIntent.putExtra("initial_seconds", intent.getIntExtra("call_duration_seconds", 0))
@@ -30,7 +30,7 @@ class CallOngoingTimeNotificationReceiver : BroadcastReceiver() {
                 }
             }
 
-            "com.example.zastro_android_call_notifications.START_MICROPHONE_NOTIFICATION" -> {
+            "${applicationId}.com.example.zastro_android_call_notifications.START_MICROPHONE_NOTIFICATION" -> {
                 val isForeground = isAppInForeground(context)
 
                 if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.UPSIDE_DOWN_CAKE && !isForeground) {
@@ -48,7 +48,7 @@ class CallOngoingTimeNotificationReceiver : BroadcastReceiver() {
                 }, 500)
             }
 
-            "com.example.zastro_android_call_notifications.UPDATE_CALL_NOTIFICATION" -> {
+            "${applicationId}.com.example.zastro_android_call_notifications.UPDATE_CALL_NOTIFICATION" -> {
                 val duration = intent.getIntExtra("call_duration_seconds", 0)
                 Log.d("CallNotificationReceiver", "Updating call notification: $duration seconds")
                 if (CallTimerService.instance != null && CallTimerService.instance?.isRunning == true) {
@@ -62,7 +62,7 @@ class CallOngoingTimeNotificationReceiver : BroadcastReceiver() {
                 }
             }
 
-            "com.example.zastro_android_call_notifications.STOP_CALL_NOTIFICATION" -> {
+            "${applicationId}.com.example.zastro_android_call_notifications.STOP_CALL_NOTIFICATION" -> {
                 Log.d("CallNotificationReceiver", "STOP_CALL_NOTIFICATION received in BroadcastReceiver")
 
                 val stopIntent = Intent(context, CallTimerService::class.java).apply {
@@ -73,7 +73,7 @@ class CallOngoingTimeNotificationReceiver : BroadcastReceiver() {
                 notificationManager.cancel(CallTimerService.CALL_NOTIFICATION_ID)
             }
 
-            "com.example.zastro_android_call_notifications.STOP_MIC_NOTIFICATION" -> {
+            "${applicationId}.com.example.zastro_android_call_notifications.STOP_MIC_NOTIFICATION" -> {
                 val micServiceIntent = Intent(context, CallForegroundService::class.java)
                 context.stopService(micServiceIntent)
             }

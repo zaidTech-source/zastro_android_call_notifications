@@ -37,8 +37,8 @@
             android:enabled="true"
             android:exported="true">
             <intent-filter>
-                <action android:name="com.example.zastro_android_call_notifications.SHOW_CALL_NOTIFICATION" />
-                <action android:name="com.example.zastro_android_call_notifications.CANCEL_CALL_NOTIFICATION" />
+                <action android:name="${applicationId}.com.example.zastro_android_call_notifications.SHOW_CALL_NOTIFICATION" />
+                <action android:name="${applicationId}.com.example.zastro_android_call_notifications.CANCEL_CALL_NOTIFICATION" />
             </intent-filter>
         </receiver>
 
@@ -61,11 +61,11 @@
             android:enabled="true"
             android:exported="true">
             <intent-filter>
-                <action android:name="com.example.zastro_android_call_notifications.START_CALL_NOTIFICATION" />
-                <action android:name="com.example.zastro_android_call_notifications.START_MICROPHONE_NOTIFICATION" />
-                <action android:name="com.example.zastro_android_call_notifications.UPDATE_CALL_NOTIFICATION" />
-                <action android:name="com.example.zastro_android_call_notifications.STOP_CALL_NOTIFICATION" />
-                <action android:name="com.example.zastro_android_call_notifications.STOP_MIC_NOTIFICATION" />
+                <action android:name="${applicationId}.com.example.zastro_android_call_notifications.START_CALL_NOTIFICATION" />
+                <action android:name="${applicationId}.com.example.zastro_android_call_notifications.START_MICROPHONE_NOTIFICATION" />
+                <action android:name="${applicationId}.com.example.zastro_android_call_notifications.UPDATE_CALL_NOTIFICATION" />
+                <action android:name="${applicationId}.com.example.zastro_android_call_notifications.STOP_CALL_NOTIFICATION" />
+                <action android:name="${applicationId}.com.example.zastro_android_call_notifications.STOP_MIC_NOTIFICATION" />
             </intent-filter>
         </receiver>
 
