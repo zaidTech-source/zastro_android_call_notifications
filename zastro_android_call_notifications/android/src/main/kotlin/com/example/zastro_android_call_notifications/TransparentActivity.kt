@@ -59,9 +59,15 @@ class TransparentActivity : Activity() {
 
         val context = applicationContext
         val launchIntent = context.packageManager.getLaunchIntentForPackage(context.packageName)?.apply {
-            flags = Intent.FLAG_ACTIVITY_NEW_TASK or
+            flags = Intent.FLAG_ACTIVITY_NO_ANIMATION or
+                    Intent.FLAG_ACTIVITY_NO_HISTORY or
+                    Intent.FLAG_ACTIVITY_REORDER_TO_FRONT or
                     Intent.FLAG_ACTIVITY_CLEAR_TOP or
                     Intent.FLAG_ACTIVITY_SINGLE_TOP
+                    /*flags = Intent.FLAG_ACTIVITY_NEW_TASK or
+                            Intent.FLAG_ACTIVITY_CLEAR_TOP or
+                            Intent.FLAG_ACTIVITY_SINGLE_TOP or
+                            Intent.FLAG_ACTIVITY_RESET_TASK_IF_NEEDED*/
             putExtra("message_data_in_string", messageDataInString)
             putExtra("key", intent.action)
         }
