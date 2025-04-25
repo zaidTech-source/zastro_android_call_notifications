@@ -11,7 +11,7 @@ import android.util.Log
 class CallReceiver : BroadcastReceiver() {
     override fun onReceive(context: Context, intent: Intent) {
         Log.d("CallReceiver", "Received broadcast for action: ${intent?.action}")
-
+        println("📨 CallReceiver: ${intent?.action}")
         if (intent.action == "com.example.zastro_android_call_notifications.SHOW_CALL_NOTIFICATION") {
             val messageDataJsonString = intent.getStringExtra("message_data_in_string")
             val messageData: JSONObject? = messageDataJsonString?.let {
