@@ -66,28 +66,35 @@ class TransparentActivity : Activity() {
 //            putExtra("message_data_in_string", messageDataInString)
 //            putExtra("key", intent.action)
 //        }
-        val launchIntent = context.packageManager.getLaunchIntentForPackage(context.packageName)?.cloneFilter()
-
-        launchIntent?.apply {
-            addFlags(
-                Intent.FLAG_ACTIVITY_NEW_TASK or
-                        Intent.FLAG_ACTIVITY_CLEAR_TOP or
-                        Intent.FLAG_ACTIVITY_SINGLE_TOP or
-                        Intent.FLAG_ACTIVITY_RESET_TASK_IF_NEEDED
-            )
-            putExtra("message_data_in_string", messageDataInString)
-            putExtra("key", intent.action)
-        }
 
 
-        if (launchIntent != null) {
+
+//        if (launchIntent != null) {
+//            context.startActivity(launchIntent)
+//            Log.d("TransparentActivity", "App main activity launched")
+//        } else {
+//            Log.e("TransparentActivity", "Failed to get launch intent for app")
+//        }
+
+        createLaunchIntent(context, intent.action, messageDataInString)?.let { launchIntent ->
             context.startActivity(launchIntent)
-            Log.d("TransparentActivity", "App main activity launched")
-        } else {
-            Log.e("TransparentActivity", "Failed to get launch intent for app")
         }
+
 
         finish()
         overridePendingTransition(0, 0) // No animation
     }
+
+    fun createLaunchIntent(context: Context, action: String, data: String): Intent? {
+        val intent = context.packageManager.getLaunchIntentForPackage(context.packageName)?.cloneFilter(context)
+        intent?.addFlags(
+            Intent.FLAG_ACTIVITY_SINGLE_TOP or
+                    Intent.FLAG_ACTIVITY_REORDER_TO_FRONT or
+                    Intent.FLAG_ACTIVITY_CLEAR_TOP
+        )
+        intent?.putExtra("message_data_in_string", messageDataInString)
+        intent?.putExtra("key", intent.action)
+        return intent
+    }
+
 }
