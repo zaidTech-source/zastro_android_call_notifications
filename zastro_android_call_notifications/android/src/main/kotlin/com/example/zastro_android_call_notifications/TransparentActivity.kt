@@ -76,10 +76,9 @@ class TransparentActivity : Activity() {
 //            Log.e("TransparentActivity", "Failed to get launch intent for app")
 //        }
 
-        createLaunchIntent(this, intent.action ?: "", messageDataInString)?.let { launchIntent ->
+        createLaunchIntent(context, intent.action ?: "", messageDataInString)?.let { launchIntent ->
             context.startActivity(launchIntent)
         }
-
 
 
         finish()
@@ -89,7 +88,8 @@ class TransparentActivity : Activity() {
     fun createLaunchIntent(context: Context, action: String, data: String): Intent? {
         val intent = context.packageManager.getLaunchIntentForPackage(context.packageName)?.cloneFilter()
         intent?.addFlags(
-            Intent.FLAG_ACTIVITY_SINGLE_TOP or
+            Intent.FLAG_ACTIVITY_NEW_TASK or
+                    Intent.FLAG_ACTIVITY_SINGLE_TOP or
                     Intent.FLAG_ACTIVITY_REORDER_TO_FRONT or
                     Intent.FLAG_ACTIVITY_CLEAR_TOP
         )
@@ -97,5 +97,6 @@ class TransparentActivity : Activity() {
         intent?.putExtra("key", action)
         return intent
     }
+
 
 }
