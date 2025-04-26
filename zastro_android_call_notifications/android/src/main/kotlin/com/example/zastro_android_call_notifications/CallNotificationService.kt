@@ -237,13 +237,7 @@ class CallNotificationService : Service() {
 
         println("Sending messageDataInString: $messageDataInString")
 
-        val answerIntent = TransparentActivity.getIntent(
-            this, ACTION_ANSWER_CALL, messageDataInString, bundle
-        )
-
-        val declineIntent = TransparentActivity.getIntent(
-            this, ACTION_DECLINE_CALL, messageDataInString, bundle
-        )
+        val answerIntent = TransparentActivity.getIntent(this, ACTION_ANSWER_CALL, messageDataInString, bundle)
 
         val answerPendingIntent = if (isAppInForeground()) {
             PendingIntent.getActivity(
@@ -251,14 +245,14 @@ class CallNotificationService : Service() {
                 PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
             )
         } else {
-            val fallbackIntent = TransparentActivity.getIntent(
-                this, ACTION_ANSWER_CALL, messageDataInString, bundle
-            )
             PendingIntent.getActivity(
-                this, 4, fallbackIntent,
+                this, 4, launchIntent.apply {
+                    putExtra("key", ACTION_ANSWER_CALL) } ?: Intent(),
                 PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
             )
         }
+
+        val declineIntent = TransparentActivity.getIntent(this, ACTION_DECLINE_CALL, messageDataInString, bundle)
 
         val declinePendingIntent = if (isAppInForeground()) {
             PendingIntent.getActivity(
@@ -266,15 +260,12 @@ class CallNotificationService : Service() {
                 PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
             )
         } else {
-            val fallbackIntent = TransparentActivity.getIntent(
-                this, ACTION_DECLINE_CALL, messageDataInString, bundle
-            )
             PendingIntent.getActivity(
-                this, 5, fallbackIntent,
+                this, 5, launchIntent.apply {
+                    putExtra("key", ACTION_DECLINE_CALL) } ?: Intent(),
                 PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
             )
         }
-
 
         val notificationBuilder = NotificationCompat.Builder(this, CHANNEL_ID)
             .setSmallIcon(R.drawable.incoming_call_arrow)
