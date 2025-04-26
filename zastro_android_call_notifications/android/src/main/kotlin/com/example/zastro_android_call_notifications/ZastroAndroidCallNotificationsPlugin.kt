@@ -43,7 +43,7 @@ class ZastroAndroidCallNotificationsPlugin : FlutterPlugin, MethodCallHandler, A
       context = binding.applicationContext
       methodChannel = MethodChannel(binding.binaryMessenger, "Chat notifications")
       callTimerChannel = MethodChannel(binding.binaryMessenger, "Call Timer")
-      methodChannel.setMethodCallHandler(this)
+      methodChannel?.setMethodCallHandler(this)
       MethodChannelHelper.setMethodChannel(methodChannel)
     } else {
       Log.i("PLUGIN", "MethodChannel already initialized, skipping.")
@@ -266,7 +266,7 @@ class ZastroAndroidCallNotificationsPlugin : FlutterPlugin, MethodCallHandler, A
 
   override fun onDetachedFromEngine(@NonNull binding: FlutterPlugin.FlutterPluginBinding) {
     Log.d("FlutterCallkitIncoming", "onDetachedFromEngine called")
-    methodChannel.setMethodCallHandler(null)
+    methodChannel?.setMethodCallHandler(null)
     callTimerChannel.setMethodCallHandler(null)
     MethodChannelHelper.dispose()
   }
