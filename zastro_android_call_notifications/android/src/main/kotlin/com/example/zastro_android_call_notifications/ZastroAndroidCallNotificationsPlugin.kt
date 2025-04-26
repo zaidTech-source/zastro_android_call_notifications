@@ -250,7 +250,7 @@ class ZastroAndroidCallNotificationsPlugin : FlutterPlugin, MethodCallHandler, A
   }
 
   override fun onDetachedFromActivityForConfigChanges() {
-//    activity = null
+    activity = null
   }
 
   override fun onDetachedFromEngine(@NonNull binding: FlutterPlugin.FlutterPluginBinding) {
