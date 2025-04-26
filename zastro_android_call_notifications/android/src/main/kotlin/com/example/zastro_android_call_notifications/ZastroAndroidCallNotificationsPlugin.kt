@@ -63,7 +63,7 @@ class ZastroAndroidCallNotificationsPlugin : FlutterPlugin, MethodCallHandler, A
               putExtra("message_data_in_string", messageData)
             }
             intent.setPackage(context.packageName)
-            Log.d("FlutterCallkitIncoming", "Triggering triggerBroadcastNotification with data: " + data.toString())
+            Log.d("FlutterCallkitIncoming", "Triggering triggerBroadcastNotification with data: " + messageData.toString())
 
             context.sendBroadcast(intent)
             println("📡 Broadcast sent!")
@@ -82,7 +82,7 @@ class ZastroAndroidCallNotificationsPlugin : FlutterPlugin, MethodCallHandler, A
           val callerName = call.argument<String>("caller_name") ?: "Unknown Caller"
           val callerImage = call.argument<String>("caller_image") ?: ""
           val messageDataInString = call.argument<String>("message_data_in_string") ?: "{}"
-          Log.d("FlutterCallkitIncoming", "Triggering showIncomingNotification with data: " + data.toString())
+          Log.d("FlutterCallkitIncoming", "Triggering showIncomingNotification with data: " + messageDataInString.toString())
 
           startCallNotificationService(
             type,
