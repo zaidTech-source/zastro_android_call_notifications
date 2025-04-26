@@ -36,6 +36,7 @@ class ZastroAndroidCallNotificationsPlugin : FlutterPlugin, MethodCallHandler, A
   private var latestNotificationData: Map<String, Any?>? = null
 
   override fun onAttachedToEngine(@NonNull binding: FlutterPlugin.FlutterPluginBinding) {
+    Log.d("FlutterCallkitIncoming", "onAttachedToEngine called")
     context = binding.applicationContext
     channel = MethodChannel(binding.binaryMessenger, "Chat notifications")
     callTimerChannel = MethodChannel(binding.binaryMessenger, "Call Timer")
@@ -62,6 +63,7 @@ class ZastroAndroidCallNotificationsPlugin : FlutterPlugin, MethodCallHandler, A
               putExtra("message_data_in_string", messageData)
             }
             intent.setPackage(context.packageName)
+            Log.d("FlutterCallkitIncoming", "Triggering triggerBroadcastNotification with data: " + data.toString())
 
             context.sendBroadcast(intent)
             println("📡 Broadcast sent!")
@@ -80,6 +82,7 @@ class ZastroAndroidCallNotificationsPlugin : FlutterPlugin, MethodCallHandler, A
           val callerName = call.argument<String>("caller_name") ?: "Unknown Caller"
           val callerImage = call.argument<String>("caller_image") ?: ""
           val messageDataInString = call.argument<String>("message_data_in_string") ?: "{}"
+          Log.d("FlutterCallkitIncoming", "Triggering showIncomingNotification with data: " + data.toString())
 
           startCallNotificationService(
             type,
@@ -150,6 +153,7 @@ class ZastroAndroidCallNotificationsPlugin : FlutterPlugin, MethodCallHandler, A
   }
 
   override fun onAttachedToActivity(binding: ActivityPluginBinding) {
+    Log.d("FlutterCallkitIncoming", "onAttachedToActivity called")
     activity = binding.activity
     binding.addOnNewIntentListener { intent ->
       handleIntent(intent)
@@ -157,11 +161,11 @@ class ZastroAndroidCallNotificationsPlugin : FlutterPlugin, MethodCallHandler, A
     }
     handleIntent(binding.activity.intent)
 
-    // Register all broadcast receivers
+    /*// Register all broadcast receivers
     callReceiver = CallReceiver()
     val callFilter = IntentFilter().apply {
-      addAction("com.example.zastro_android_call_notifications.SHOW_CALL_NOTIFICATION")
-      addAction("com.example.zastro_android_call_notifications.CANCEL_CALL_NOTIFICATION")
+      addAction("${context.packageName}.com.example.zastro_android_call_notifications.SHOW_CALL_NOTIFICATION")
+      addAction("${context.packageName}.com.example.zastro_android_call_notifications.CANCEL_CALL_NOTIFICATION")
     }
     if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
       context.registerReceiver(callReceiver, callFilter, Context.RECEIVER_EXPORTED)
@@ -186,18 +190,18 @@ class ZastroAndroidCallNotificationsPlugin : FlutterPlugin, MethodCallHandler, A
 
     callOngoingReceiver = CallOngoingTimeNotificationReceiver()
     val ongoingFilter = IntentFilter().apply {
-      addAction("com.example.zastro_android_call_notifications.START_CALL_NOTIFICATION")
-      addAction("com.example.zastro_android_call_notifications.START_MICROPHONE_NOTIFICATION")
-      addAction("com.example.zastro_android_call_notifications.UPDATE_CALL_NOTIFICATION")
-      addAction("com.example.zastro_android_call_notifications.STOP_CALL_NOTIFICATION")
-      addAction("com.example.zastro_android_call_notifications.STOP_MIC_NOTIFICATION")
+      addAction("${context.packageName}.com.example.zastro_android_call_notifications.START_CALL_NOTIFICATION")
+      addAction("${context.packageName}.com.example.zastro_android_call_notifications.START_MICROPHONE_NOTIFICATION")
+      addAction("${context.packageName}.com.example.zastro_android_call_notifications.UPDATE_CALL_NOTIFICATION")
+      addAction("${context.packageName}.com.example.zastro_android_call_notifications.STOP_CALL_NOTIFICATION")
+      addAction("${context.packageName}.com.example.zastro_android_call_notifications.STOP_MIC_NOTIFICATION")
     }
     if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
       context.registerReceiver(callOngoingReceiver, ongoingFilter, Context.RECEIVER_EXPORTED)
     } else {
       @Suppress("DEPRECATION")
       context.registerReceiver(callOngoingReceiver, ongoingFilter)
-    }
+    }*/
   }
 
   private fun handleIntent(intent: Intent?) {
@@ -228,7 +232,7 @@ class ZastroAndroidCallNotificationsPlugin : FlutterPlugin, MethodCallHandler, A
   override fun onDetachedFromActivity() {
     activity = null
 
-    try {
+    /*try {
       context.unregisterReceiver(callReceiver)
     } catch (e: Exception) {
       Log.w("ZastroPlugin", "CallReceiver already unregistered or not registered: ${e.message}")
@@ -242,7 +246,7 @@ class ZastroAndroidCallNotificationsPlugin : FlutterPlugin, MethodCallHandler, A
       context.unregisterReceiver(callOngoingReceiver)
     } catch (e: Exception) {
       Log.w("ZastroPlugin", "CallOngoingReceiver already unregistered or not registered: ${e.message}")
-    }
+    }*/
   }
 
   override fun onReattachedToActivityForConfigChanges(binding: ActivityPluginBinding) {
@@ -254,6 +258,7 @@ class ZastroAndroidCallNotificationsPlugin : FlutterPlugin, MethodCallHandler, A
   }
 
   override fun onDetachedFromEngine(@NonNull binding: FlutterPlugin.FlutterPluginBinding) {
+    Log.d("FlutterCallkitIncoming", "onDetachedFromEngine called")
     channel.setMethodCallHandler(null)
     callTimerChannel.setMethodCallHandler(null)
     MethodChannelHelper.dispose()
