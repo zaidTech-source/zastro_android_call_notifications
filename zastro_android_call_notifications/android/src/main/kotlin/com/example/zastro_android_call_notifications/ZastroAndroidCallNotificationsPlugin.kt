@@ -259,8 +259,8 @@ class ZastroAndroidCallNotificationsPlugin : FlutterPlugin, MethodCallHandler, A
 
   override fun onDetachedFromEngine(@NonNull binding: FlutterPlugin.FlutterPluginBinding) {
     Log.d("FlutterCallkitIncoming", "onDetachedFromEngine called")
-    channel.setMethodCallHandler(null)
-    callTimerChannel.setMethodCallHandler(null)
-    MethodChannelHelper.dispose()
+//    channel.setMethodCallHandler(null)
+//    callTimerChannel.setMethodCallHandler(null)
+//    MethodChannelHelper.dispose()
   }
 }
