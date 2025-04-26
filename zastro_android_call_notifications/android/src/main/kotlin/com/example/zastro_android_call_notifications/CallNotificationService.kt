@@ -239,18 +239,19 @@ class CallNotificationService : Service() {
 
         val answerIntent = TransparentActivity.getIntent(this, ACTION_ANSWER_CALL, messageDataInString, bundle)
 
-        val answerPendingIntent = if (isAppInForeground()) {
+        val answerPendingIntent =
+//            if (isAppInForeground()) {
             PendingIntent.getActivity(
                 this, 0, answerIntent,
                 PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
             )
-        } else {
-            PendingIntent.getActivity(
-                this, 4, launchIntent.apply {
-                    putExtra("key", ACTION_ANSWER_CALL) } ?: Intent(),
-                PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
-            )
-        }
+//        } else {
+//            PendingIntent.getActivity(
+//                this, 4, launchIntent.apply {
+//                    putExtra("key", ACTION_ANSWER_CALL) } ?: Intent(),
+//                PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
+//            )
+//        }
 
         val declineIntent = TransparentActivity.getIntent(this, ACTION_DECLINE_CALL, messageDataInString, bundle)
 
