@@ -76,7 +76,7 @@ class TransparentActivity : Activity() {
 //            Log.e("TransparentActivity", "Failed to get launch intent for app")
 //        }
 
-        createLaunchIntent(context, intent.action ?: "", messageDataInString)?.let { launchIntent ->
+        createLaunchIntent(this, intent.action ?: "", messageDataInString)?.let { launchIntent ->
             context.startActivity(launchIntent)
         }
 
