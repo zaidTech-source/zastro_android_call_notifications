@@ -27,28 +27,28 @@ import android.content.IntentFilter
 
 class ZastroAndroidCallNotificationsPlugin : FlutterPlugin, MethodCallHandler, ActivityAware {
   private lateinit var context: Context
-  private lateinit var methodChannel: MethodChannel
-  private lateinit var callTimerChannel: MethodChannel
+  private var channel: MethodChannel? = null
+  private var callTimerChannel: MethodChannel? = null
   private lateinit var callReceiver: CallReceiver
   private lateinit var callActionReceiver: CallActionReceiver
   private lateinit var callOngoingReceiver: CallOngoingTimeNotificationReceiver
   private var activity: Activity? = null
   private var latestNotificationData: Map<String, Any?>? = null
 
-  private var methodChannel: MethodChannel? = null
-
   override fun onAttachedToEngine(@NonNull binding: FlutterPlugin.FlutterPluginBinding) {
     Log.d("FlutterCallkitIncoming", "onAttachedToEngine called")
-    if (methodChannel == null) {
-      context = binding.applicationContext
-      methodChannel = MethodChannel(binding.binaryMessenger, "Chat notifications")
-      callTimerChannel = MethodChannel(binding.binaryMessenger, "Call Timer")
-      methodChannel?.setMethodCallHandler(this)
-      MethodChannelHelper.setMethodChannel(methodChannel)
-    } else {
-      Log.i("PLUGIN", "MethodChannel already initialized, skipping.")
+    context = binding.applicationContext
+
+    if (channel == null) {
+      channel = MethodChannel(binding.binaryMessenger, "Chat notifications")
+      channel?.setMethodCallHandler(this)
+      MethodChannelHelper.setMethodChannel(channel!!)
     }
 
+    if (callTimerChannel == null) {
+      callTimerChannel = MethodChannel(binding.binaryMessenger, "Call Timer")
+      // Optionally setMethodCallHandler for callTimerChannel if needed
+    }
   }
 
   override fun onMethodCall(@NonNull call: MethodCall, @NonNull result: Result) {
@@ -266,8 +266,10 @@ class ZastroAndroidCallNotificationsPlugin : FlutterPlugin, MethodCallHandler, A
 
   override fun onDetachedFromEngine(@NonNull binding: FlutterPlugin.FlutterPluginBinding) {
     Log.d("FlutterCallkitIncoming", "onDetachedFromEngine called")
-    methodChannel?.setMethodCallHandler(null)
-    callTimerChannel.setMethodCallHandler(null)
+    channel?.setMethodCallHandler(null)
+    callTimerChannel?.setMethodCallHandler(null)
+    channel = null
+    callTimerChannel = null
     MethodChannelHelper.dispose()
   }
 }
