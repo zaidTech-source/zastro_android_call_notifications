@@ -66,7 +66,7 @@ class TransparentActivity : Activity() {
 //            putExtra("message_data_in_string", messageDataInString)
 //            putExtra("key", intent.action)
 //        }
-        val launchIntent = context.packageManager.getLaunchIntentForPackage(context.packageName)?.cloneFilter(context)
+        val launchIntent = context.packageManager.getLaunchIntentForPackage(context.packageName)?.cloneFilter()
 
         launchIntent?.apply {
             addFlags(
@@ -78,6 +78,7 @@ class TransparentActivity : Activity() {
             putExtra("message_data_in_string", messageDataInString)
             putExtra("key", intent.action)
         }
+
 
         if (launchIntent != null) {
             context.startActivity(launchIntent)
