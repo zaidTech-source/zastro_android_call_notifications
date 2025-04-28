@@ -123,7 +123,7 @@ class OngoingCallNotificationHandler {
     }
   }*/
 
-  static const MethodChannel _ongoingCallChannel = MethodChannel('Chat notifications');
+  static const MethodChannel _ongoingCallChannel = MethodChannel('Ongoing Call Notifications');
 
   static Future<void> startOnGoingCallNotification(int seconds) async {
     try {
