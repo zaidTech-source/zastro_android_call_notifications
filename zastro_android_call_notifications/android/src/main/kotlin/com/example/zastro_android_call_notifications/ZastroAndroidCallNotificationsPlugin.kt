@@ -38,6 +38,7 @@ class ZastroAndroidCallNotificationsPlugin : FlutterPlugin, MethodCallHandler, A
   private lateinit var callOngoingReceiver: CallOngoingTimeNotificationReceiver
   private var activity: Activity? = null
   private var latestNotificationData: Map<String, Any?>? = null
+  private lateinit var flutterEngine: FlutterEngine
 
   companion object {
     private const val FLUTTER_ENGINE_NAME = "ZastroFlutterEngine"
