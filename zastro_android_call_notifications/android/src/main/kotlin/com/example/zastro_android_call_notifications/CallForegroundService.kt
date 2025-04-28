@@ -38,16 +38,14 @@ class CallForegroundService : Service() {
             .setSmallIcon(R.drawable.ic_ongoing_call)
             .setPriority(NotificationCompat.PRIORITY_HIGH)
             .setCategory(NotificationCompat.CATEGORY_SERVICE)
+            .setOngoing(true)
             .build()
     }
 
     private fun startForegroundServiceProperly() {
         val notification = getNotification()
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
-            val serviceTypes = (ServiceInfo.FOREGROUND_SERVICE_TYPE_MICROPHONE or
-                    ServiceInfo.FOREGROUND_SERVICE_TYPE_MEDIA_PLAYBACK).toInt()
-
-            startForeground(NOTIFICATION_ID, notification, serviceTypes)
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.UPSIDE_DOWN_CAKE) {
+            startForeground(NOTIFICATION_ID, notification, ServiceInfo.FOREGROUND_SERVICE_TYPE_MICROPHONE)
         } else {
             startForeground(NOTIFICATION_ID, notification)
         }
