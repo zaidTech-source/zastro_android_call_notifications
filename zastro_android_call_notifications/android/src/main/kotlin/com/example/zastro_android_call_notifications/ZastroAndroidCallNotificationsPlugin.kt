@@ -309,6 +309,7 @@ class ZastroAndroidCallNotificationsPlugin : FlutterPlugin, MethodCallHandler, A
     Log.d("FlutterCallkitIncoming", "onDetachedFromEngine called")
     channel.setMethodCallHandler(null)
     callTimerChannel.setMethodCallHandler(null)
+    ongoingCallChannel.setMethodCallHandler(null)
     MethodChannelHelper.dispose()
   }
 }
