@@ -17,17 +17,17 @@ class CallOngoingTimeNotificationReceiver : BroadcastReceiver() {
 
         when (intent.action) {
             "${context.packageName}.com.example.zastro_android_call_notifications.START_CALL_NOTIFICATION" -> {
-                if (CallTimerService.instance?.isRunning != true) {
+//                if (CallTimerService.instance?.isRunning != true) {
                     val serviceIntent = Intent(context, CallTimerService::class.java)
                 serviceIntent.putExtra("initial_seconds", intent.getIntExtra("call_duration_seconds", 0))
-                Handler(Looper.getMainLooper()).postDelayed({
+//                Handler(Looper.getMainLooper()).postDelayed({
                     if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.O) {
                         context.startForegroundService(serviceIntent)
                     } else {
                         context.startService(serviceIntent)
                     }
-                }, 500)
-                }
+//                }, 500)
+//                }
             }
 
             "${context.packageName}.com.example.zastro_android_call_notifications.START_MICROPHONE_NOTIFICATION" -> {
@@ -39,13 +39,13 @@ class CallOngoingTimeNotificationReceiver : BroadcastReceiver() {
                 }
 
                 val foregroundServiceIntent = Intent(context, CallForegroundService::class.java)
-                Handler(Looper.getMainLooper()).postDelayed({
+//                Handler(Looper.getMainLooper()).postDelayed({
                 if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.O) {
                     context.startForegroundService(foregroundServiceIntent)
                 } else {
                     context.startService(foregroundServiceIntent)
                 }
-                }, 500)
+//                }, 500)
             }
 
             "${context.packageName}.com.example.zastro_android_call_notifications.UPDATE_CALL_NOTIFICATION" -> {
