@@ -40,10 +40,14 @@ class ZastroAndroidCallNotificationsPlugin : FlutterPlugin, MethodCallHandler, A
     Log.d("FlutterCallkitIncoming", "onAttachedToEngine called")
     context = binding.applicationContext
     channel = MethodChannel(binding.binaryMessenger, "Chat notifications")
+    channel.setMethodCallHandler(this)
+
     callTimerChannel = MethodChannel(binding.binaryMessenger, "Call Timer")
+    callTimerChannel.setMethodCallHandler(this)
+
     ongoingCallChannel = MethodChannel(binding.binaryMessenger, "Ongoing Call Notifications")
     ongoingCallChannel.setMethodCallHandler(this)
-    channel.setMethodCallHandler(this)
+
     MethodChannelHelper.setMethodChannel(channel)
   }
 
