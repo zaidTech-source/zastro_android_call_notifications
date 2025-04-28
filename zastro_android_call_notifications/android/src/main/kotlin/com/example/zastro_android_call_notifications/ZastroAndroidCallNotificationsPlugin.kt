@@ -36,8 +36,18 @@ class ZastroAndroidCallNotificationsPlugin : FlutterPlugin, MethodCallHandler, A
   private var activity: Activity? = null
   private var latestNotificationData: Map<String, Any?>? = null
 
+  companion object {
+    private const val FLUTTER_ENGINE_NAME = "ZastroFlutterEngine"
+  }
+
   override fun onAttachedToEngine(@NonNull binding: FlutterPlugin.FlutterPluginBinding) {
     Log.d("FlutterCallkitIncoming", "onAttachedToEngine called")
+
+    flutterEngine = FlutterEngine(context)
+
+    // Cache the FlutterEngine for reuse
+    FlutterEngineCache.getInstance().put(FLUTTER_ENGINE_NAME, flutterEngine)
+
     context = binding.applicationContext
     channel = MethodChannel(binding.binaryMessenger, "Chat notifications")
     channel.setMethodCallHandler(this)
@@ -49,6 +59,10 @@ class ZastroAndroidCallNotificationsPlugin : FlutterPlugin, MethodCallHandler, A
     ongoingCallChannel.setMethodCallHandler(this)
 
     MethodChannelHelper.setMethodChannel(channel)
+
+    // Initialize the FlutterEngine and load plugins
+    flutterEngine.navigationChannel.setInitialRoute("/")
+    flutterEngine.dartExecutor.executeDartEntrypoint(DartExecutor.DartEntrypoint.createDefault())
   }
 
   override fun onMethodCall(@NonNull call: MethodCall, @NonNull result: Result) {
@@ -310,6 +324,7 @@ class ZastroAndroidCallNotificationsPlugin : FlutterPlugin, MethodCallHandler, A
     channel.setMethodCallHandler(null)
     callTimerChannel.setMethodCallHandler(null)
     ongoingCallChannel.setMethodCallHandler(null)
+    FlutterEngineCache.getInstance().remove(FLUTTER_ENGINE_NAME)
     MethodChannelHelper.dispose()
   }
 }
