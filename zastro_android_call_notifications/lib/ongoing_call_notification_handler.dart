@@ -3,9 +3,10 @@ import 'dart:io';
 import 'package:flutter/foundation.dart';
 import 'package:android_intent_plus/android_intent.dart';
 import 'package:android_intent_plus/flag.dart';
+import 'package:flutter/services.dart';
 
 class OngoingCallNotificationHandler {
-  static void startOnGoingCallNotification(int seconds) async {
+  /*static void startOnGoingCallNotification(int seconds) async {
     if (Platform.isAndroid) {
       try {
         var intent = AndroidIntent(
@@ -120,5 +121,62 @@ class OngoingCallNotificationHandler {
         }
       }
     }
+  }*/
+
+  static const MethodChannel _ongoingCallChannel = MethodChannel('Ongoing Call Notifications');
+
+  static Future<void> startOnGoingCallNotification(int seconds) async {
+    try {
+      await _ongoingCallChannel.invokeMethod('startOngoingCallNotification', {
+        'call_duration_seconds': seconds,
+      });
+    } catch (e) {
+      if (kDebugMode) {
+        print("Error starting call notification: $e");
+      }
+    }
   }
+
+  static Future<void> startMicNotification() async {
+    try {
+      await _ongoingCallChannel.invokeMethod('startMicNotification');
+    } catch (e) {
+      if (kDebugMode) {
+        print("Error starting mic notification: $e");
+      }
+    }
+  }
+
+  static Future<void> updateCallDuration(int seconds) async {
+    try {
+      await _ongoingCallChannel.invokeMethod('updateCallDuration', {
+        'call_duration_seconds': seconds,
+      });
+    } catch (e) {
+      if (kDebugMode) {
+        print("Error updating call duration: $e");
+      }
+    }
+  }
+
+  static Future<void> stopOngoingCallNotification() async {
+    try {
+      await _ongoingCallChannel.invokeMethod('stopOngoingCallNotification');
+    } catch (e) {
+      if (kDebugMode) {
+        print("Error stopping call notification: $e");
+      }
+    }
+  }
+
+  static Future<void> stopMicNotification() async {
+    try {
+      await _ongoingCallChannel.invokeMethod('stopMicNotification');
+    } catch (e) {
+      if (kDebugMode) {
+        print("Error stopping mic notification: $e");
+      }
+    }
+  }
+
 }

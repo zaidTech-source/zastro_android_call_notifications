@@ -29,6 +29,7 @@ class ZastroAndroidCallNotificationsPlugin : FlutterPlugin, MethodCallHandler, A
   private lateinit var context: Context
   private lateinit var channel: MethodChannel
   private lateinit var callTimerChannel: MethodChannel
+  private lateinit var ongoingCallChannel: MethodChannel
   private lateinit var callReceiver: CallReceiver
   private lateinit var callActionReceiver: CallActionReceiver
   private lateinit var callOngoingReceiver: CallOngoingTimeNotificationReceiver
@@ -40,6 +41,8 @@ class ZastroAndroidCallNotificationsPlugin : FlutterPlugin, MethodCallHandler, A
     context = binding.applicationContext
     channel = MethodChannel(binding.binaryMessenger, "Chat notifications")
     callTimerChannel = MethodChannel(binding.binaryMessenger, "Call Timer")
+    ongoingCallChannel = MethodChannel(binding.binaryMessenger, "Ongoing Call Notifications")
+    ongoingCallChannel.setMethodCallHandler(this)
     channel.setMethodCallHandler(this)
     MethodChannelHelper.setMethodChannel(channel)
   }
@@ -118,6 +121,47 @@ class ZastroAndroidCallNotificationsPlugin : FlutterPlugin, MethodCallHandler, A
           val data = call.arguments as? Map<String, Any?> ?: emptyMap()
           Log.d("ZastroPlugin", "Flutter sent data: $data")
           result.success("Data received successfully!")
+        }
+
+        "startOngoingCallNotification" -> {
+          val seconds = call.argument<Int>("call_duration_seconds") ?: 0
+          val intent = Intent("${context.packageName}.com.example.zastro_android_call_notifications.START_CALL_NOTIFICATION").apply {
+            putExtra("call_duration_seconds", seconds)
+          }
+          intent.setPackage(context.packageName)
+          context.sendBroadcast(intent)
+          result.success("START_CALL_NOTIFICATION broadcast sent!")
+        }
+
+        "startMicNotification" -> {
+          val intent = Intent("${context.packageName}.com.example.zastro_android_call_notifications.START_MICROPHONE_NOTIFICATION")
+          intent.setPackage(context.packageName)
+          context.sendBroadcast(intent)
+          result.success("START_MICROPHONE_NOTIFICATION broadcast sent!")
+        }
+
+        "updateCallDuration" -> {
+          val seconds = call.argument<Int>("call_duration_seconds") ?: 0
+          val intent = Intent("${context.packageName}.com.example.zastro_android_call_notifications.UPDATE_CALL_NOTIFICATION").apply {
+            putExtra("call_duration_seconds", seconds)
+          }
+          intent.setPackage(context.packageName)
+          context.sendBroadcast(intent)
+          result.success("UPDATE_CALL_NOTIFICATION broadcast sent!")
+        }
+
+        "stopOngoingCallNotification" -> {
+          val intent = Intent("${context.packageName}.com.example.zastro_android_call_notifications.STOP_CALL_NOTIFICATION")
+          intent.setPackage(context.packageName)
+          context.sendBroadcast(intent)
+          result.success("STOP_CALL_NOTIFICATION broadcast sent!")
+        }
+
+        "stopMicNotification" -> {
+          val intent = Intent("${context.packageName}.com.example.zastro_android_call_notifications.STOP_MIC_NOTIFICATION")
+          intent.setPackage(context.packageName)
+          context.sendBroadcast(intent)
+          result.success("STOP_MIC_NOTIFICATION broadcast sent!")
         }
 
         else -> result.notImplemented()
