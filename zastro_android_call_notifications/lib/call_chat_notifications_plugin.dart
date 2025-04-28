@@ -4,11 +4,26 @@ import 'package:android_intent_plus/android_intent.dart';
 import 'package:android_intent_plus/flag.dart';
 import 'package:flutter/foundation.dart';
 
+import 'notification_storage_helper.dart';
+
 class ChatNotificationPlugin {
   static const MethodChannel _channel = MethodChannel('Chat notifications');
 
   static Future<void> showCallNotification(Map<String, dynamic> data) async {
     try {
+      int? notificationId = data['notificationId'];
+
+      if (notificationId != null) {
+        String lastNotificationId = await NotificationStorageHelper.getLastNotificationId();
+
+        if (lastNotificationId == notificationId.toString()) {
+          debugPrint("Duplicate notification detected in plugin, skipping call.");
+          return;
+        }
+
+        await NotificationStorageHelper.storeLastNotificationId(notificationId.toString());
+      }
+
       await _channel.invokeMethod('showCallNotification', data);
     } on PlatformException catch (e) {
       print("Error invoking showCallNotification: ${e.message}");
