@@ -51,15 +51,7 @@ class CallOngoingTimeNotificationReceiver : BroadcastReceiver() {
             "${context.packageName}.com.example.zastro_android_call_notifications.UPDATE_CALL_NOTIFICATION" -> {
                 val duration = intent.getIntExtra("call_duration_seconds", 0)
                 Log.d("CallNotificationReceiver", "Updating call notification: $duration seconds")
-                if (CallTimerService.instance != null && CallTimerService.instance?.isRunning == true) {
-                    CallTimerService.updateCallDuration(duration)
-                } else {
-                    Log.d("CallNotificationReceiver", "Service is not running, skipping update")
-                    val stopIntent = Intent(context, CallTimerService::class.java)
-                    context.stopService(stopIntent)
-                    val notificationManager = context.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
-                    notificationManager.cancel(CallTimerService.CALL_NOTIFICATION_ID)
-                }
+                CallTimerService.updateCallDuration(context, duration)
             }
 
             "${context.packageName}.com.example.zastro_android_call_notifications.STOP_CALL_NOTIFICATION" -> {
