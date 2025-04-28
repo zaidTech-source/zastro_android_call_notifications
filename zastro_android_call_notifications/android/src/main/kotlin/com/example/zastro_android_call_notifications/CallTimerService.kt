@@ -26,26 +26,26 @@ class CallTimerService : Service() {
         const val CALL_TIMER_CHANNEL_ID = "call_timer"
         const val CALL_TIMER_CHANNEL_NAME = "Call Timer"
 
-        fun updateCallDuration(context: Context, seconds: Int) {
-            val intent = Intent(context, CallTimerService::class.java).apply {
-                action = "UPDATE_DURATION"
-                putExtra("seconds", seconds)
-            }
-            context.startService(intent)
+        var instance: CallTimerService? = null
+
+        fun updateCallDuration(seconds: Int) {
+            instance?.seconds = seconds
+            instance?.updateNotification(seconds)
         }
     }
 
     override fun onCreate() {
         super.onCreate()
-//        instance = this
+        instance = this
     }
 
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
         createNotificationChannel()
-        val notification = getNotification(seconds)
+        val notification = getNotification(0)
         Log.d("ForegroundService", "started")
         if (intent != null) {
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.UPSIDE_DOWN_CAKE) {
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.UPSIDE_DOWN_CAKE) { // Android 14+
+                Log.d("ForegroundService", "iff")
                 try {
                     startForeground(
                         CALL_NOTIFICATION_ID,
@@ -54,23 +54,15 @@ class CallTimerService : Service() {
                     )
                 } catch (e: Exception) {
                     Log.e("CallTimerService", "Error starting foreground service", e)
-                    stopSelf()
-                    return START_NOT_STICKY
                 }
             } else {
+                Log.d("ForegroundService", "else")
                 startForeground(CALL_NOTIFICATION_ID, notification)
             }
+        }
 
-            when (intent.action) {
-                "ACTION_CANCEL_ONGOING_CALL_NOTIFICATION" -> {
-                    stopCallService()
-                    return START_NOT_STICKY
-                }
-                "UPDATE_DURATION" -> {
-                    seconds = intent.getIntExtra("seconds", seconds)
-                    updateNotification(seconds)
-                }
-            }
+        if (intent?.action == "ACTION_CANCEL_ONGOING_CALL_NOTIFICATION") {
+            stopCallService()
         }
 
         if (!isRunning) {
@@ -78,6 +70,7 @@ class CallTimerService : Service() {
             isRunning = true
             startTimer()
         }
+
         return START_STICKY
     }
 
@@ -92,12 +85,10 @@ class CallTimerService : Service() {
         })
     }
 
-    private var lastUpdateSeconds = -1
     private fun updateNotification(seconds: Int) {
-        if (seconds == lastUpdateSeconds || seconds % 5 != 0) return
-        lastUpdateSeconds = seconds
         val notification = getNotification(seconds)
-        val notificationManager = getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
+        val notificationManager =
+            getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
         if (isRunning) {
             notificationManager.notify(CALL_NOTIFICATION_ID, notification)
         }

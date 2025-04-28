@@ -100,8 +100,7 @@ class CallNotificationService : Service() {
         val customerUniId = intent?.getStringExtra("customerUniId") ?: ""
         println("CallNotificationService Started!$CALL_NOTIFICATION_ID")
 
-        val notificationManager =
-            getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
+        val notificationManager = getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
 
         when (intent?.action) {
             "ACTION_ANSWER_CALL" -> {
@@ -131,40 +130,29 @@ class CallNotificationService : Service() {
                     stopSelf()
                 }
             }
-
             else -> {
                 serviceScope.launch {
-                    val callerBitmap =
-                        if (callerImage.isNotEmpty()) getBitmapFromURL(callerImage) else null
-                    val notification = createCallNotification(
-                        messageDataInString,
-                        callerName,
-                        callerImage,
-                        CALL_NOTIFICATION_ID,
-                        type,
-                        uniqueId,
-                        customerUniId,
-                        callerBitmap
-                    )
+                    val callerBitmap = if (callerImage.isNotEmpty()) getBitmapFromURL(callerImage) else null
+                    val notification = createCallNotification(messageDataInString, callerName, callerImage, CALL_NOTIFICATION_ID, type, uniqueId, customerUniId, callerBitmap)
 
 
-                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.UPSIDE_DOWN_CAKE) { // Android 14+
-                        try {
-                            startForeground(
-                                CALL_NOTIFICATION_ID,
-                                notification,
-                                ServiceInfo.FOREGROUND_SERVICE_TYPE_PHONE_CALL
-                            )
-                        } catch (e: Exception) {
-                            println("CallNotificationService Error starting foreground service ${e.localizedMessage}")
-                        }
-                    } else {
-                        startForeground(CALL_NOTIFICATION_ID, notification)
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.UPSIDE_DOWN_CAKE) { // Android 14+
+                    try {
+                        startForeground(
+                            CALL_NOTIFICATION_ID,
+                            notification,
+                            ServiceInfo.FOREGROUND_SERVICE_TYPE_PHONE_CALL
+                        )
+                    } catch (e: Exception) {
+                        println("CallNotificationService Error starting foreground service ${e.localizedMessage}")
                     }
+                } else {
+                    startForeground(CALL_NOTIFICATION_ID, notification)
+                }
 
-                    startRingtone()
-                    startVibration()
-                    wakeScreen()
+                startRingtone()
+                startVibration()
+                wakeScreen()
                 }
             }
         }
@@ -174,7 +162,6 @@ class CallNotificationService : Service() {
     override fun onDestroy() {
         stopRingtone()
         stopVibration()
-        serviceScope.cancel()
         super.onDestroy()
     }
 
@@ -182,18 +169,8 @@ class CallNotificationService : Service() {
         return null
     }
 
-    private fun createCallNotification(
-        messageDataInString: String,
-        callerName: String,
-        callerImage: String,
-        CALL_NOTIFICATION_ID: Int,
-        type: String,
-        uniqueId: String,
-        customerUniId: String,
-        callerBitmap: Bitmap?
-    ): Notification {
-        val notificationManager =
-            getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
+    private fun createCallNotification(messageDataInString: String, callerName: String, callerImage: String, CALL_NOTIFICATION_ID: Int, type: String, uniqueId: String, customerUniId: String, callerBitmap: Bitmap?): Notification {
+        val notificationManager = getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
         val fullScreenIntent = Intent()
         val fullScreenPendingIntent = PendingIntent.getActivity(
             this,
@@ -240,12 +217,7 @@ class CallNotificationService : Service() {
             putString("customerUniId", customerUniId)
         }
 
-        val intent = TransparentActivity.getIntent(
-            this,
-            CALL_NOTIFICATION_CLICK,
-            messageDataInString,
-            bundle
-        )
+        val intent = TransparentActivity.getIntent(this, CALL_NOTIFICATION_CLICK, messageDataInString, bundle)
 
         // Send a broadcast if the app is in the foreground, else open the app
         val pendingIntent = if (isAppInForeground()) {
@@ -265,8 +237,7 @@ class CallNotificationService : Service() {
 
         println("Sending messageDataInString: $messageDataInString")
 
-        val answerIntent =
-            TransparentActivity.getIntent(this, ACTION_ANSWER_CALL, messageDataInString, bundle)
+        val answerIntent = TransparentActivity.getIntent(this, ACTION_ANSWER_CALL, messageDataInString, bundle)
 
         val answerPendingIntent = if (isAppInForeground()) {
             PendingIntent.getActivity(
@@ -276,14 +247,12 @@ class CallNotificationService : Service() {
         } else {
             PendingIntent.getActivity(
                 this, 4, launchIntent.apply {
-                    putExtra("key", ACTION_ANSWER_CALL)
-                } ?: Intent(),
+                    putExtra("key", ACTION_ANSWER_CALL) } ?: Intent(),
                 PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
             )
         }
 
-        val declineIntent =
-            TransparentActivity.getIntent(this, ACTION_DECLINE_CALL, messageDataInString, bundle)
+        val declineIntent = TransparentActivity.getIntent(this, ACTION_DECLINE_CALL, messageDataInString, bundle)
 
         val declinePendingIntent = if (isAppInForeground()) {
             PendingIntent.getActivity(
@@ -293,8 +262,7 @@ class CallNotificationService : Service() {
         } else {
             PendingIntent.getActivity(
                 this, 5, launchIntent.apply {
-                    putExtra("key", ACTION_DECLINE_CALL)
-                } ?: Intent(),
+                    putExtra("key", ACTION_DECLINE_CALL) } ?: Intent(),
                 PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
             )
         }
@@ -309,17 +277,16 @@ class CallNotificationService : Service() {
             .setOngoing(true)
             .setForegroundServiceBehavior(Notification.FOREGROUND_SERVICE_IMMEDIATE)
 
-        val person = Person.Builder().setName(callerName)
-            .apply {
-                if (callerBitmap != null)
+         val person = Person.Builder().setName(callerName)
+                .apply { if (callerBitmap != null)
                     setIcon(androidx.core.graphics.drawable.IconCompat.createWithBitmap(callerBitmap))
-            }
-            .build()
-        val callStyle = NotificationCompat.CallStyle.forIncomingCall(
-            person, declinePendingIntent, answerPendingIntent
-        )
-        notificationBuilder.setStyle(callStyle)
-        notificationBuilder.setContentIntent(pendingIntent)
+                }
+                .build()
+            val callStyle = NotificationCompat.CallStyle.forIncomingCall(
+                person, declinePendingIntent, answerPendingIntent
+            )
+            notificationBuilder.setStyle(callStyle)
+            notificationBuilder.setContentIntent(pendingIntent)
 //            notificationBuilder.setFullScreenIntent(pendingIntent, true) // Use below one
 //            if (!isAppInForeground()) {
 //                notificationBuilder.setFullScreenIntent(pendingIntent, true)
@@ -350,34 +317,21 @@ class CallNotificationService : Service() {
         val focusResult = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             audioManager.requestAudioFocus(focusRequest!!)
         } else {
-            audioManager.requestAudioFocus(
-                null,
-                AudioManager.STREAM_RING,
-                AudioManager.AUDIOFOCUS_GAIN_TRANSIENT
-            )
+            audioManager.requestAudioFocus(null, AudioManager.STREAM_RING, AudioManager.AUDIOFOCUS_GAIN_TRANSIENT)
         }
 
         if (focusResult == AudioManager.AUDIOFOCUS_REQUEST_GRANTED) {
-            try {
-                mediaPlayer = MediaPlayer().apply {
-                    setAudioAttributes(
-                        AudioAttributes.Builder()
-                            .setUsage(AudioAttributes.USAGE_NOTIFICATION_RINGTONE)
-                            .setContentType(AudioAttributes.CONTENT_TYPE_SONIFICATION)
-                            .build()
-                    )
-                    setDataSource(
-                        this@CallNotificationService,
-                        RingtoneManager.getDefaultUri(RingtoneManager.TYPE_RINGTONE)
-                    )
-                    isLooping = true
-                    prepare()
-                    start()
-                }
-            } catch (e: Exception) {
-                Log.e("CallNotificationService", "Failed to start ringtone", e)
-                mediaPlayer?.release()
-                mediaPlayer = null
+            mediaPlayer = MediaPlayer().apply {
+                setAudioAttributes(
+                    AudioAttributes.Builder()
+                        .setUsage(AudioAttributes.USAGE_NOTIFICATION_RINGTONE)
+                        .setContentType(AudioAttributes.CONTENT_TYPE_SONIFICATION)
+                        .build()
+                )
+                setDataSource(this@CallNotificationService, RingtoneManager.getDefaultUri(RingtoneManager.TYPE_RINGTONE))
+                isLooping = true
+                prepare()
+                start()
             }
         }
 
@@ -389,36 +343,26 @@ class CallNotificationService : Service() {
     private fun startVibration() {
         stopVibration()
 
-        vibrationJob = serviceScope.launch {
+        vibrationJob = GlobalScope.launch {
             while (isActive) {
                 if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-                    vibrator?.vibrate(
-                        VibrationEffect.createWaveform(
-                            longArrayOf(0, 700, 500, 700),
-                            0
-                        )
-                    )
+                    vibrator?.vibrate(VibrationEffect.createWaveform(longArrayOf(0, 700, 500, 700), 0))
                 } else {
                     vibrator?.vibrate(longArrayOf(0, 700, 500, 700), 0)
                 }
-                delay(3000)
+                kotlinx.coroutines.delay(3000)
             }
         }
     }
 
 
+
+
+
     private fun stopRingtone() {
-        try {
-            mediaPlayer?.let {
-                if (it.isPlaying) it.stop()
-                it.reset()
-                it.release()
-            }
-        } catch (e: Exception) {
-            Log.e("CallNotificationService", "Error stopping ringtone", e)
-        } finally {
-            mediaPlayer = null
-        }
+        mediaPlayer?.stop()
+        mediaPlayer?.release()
+        mediaPlayer = null
     }
 
     private fun stopVibration() {
@@ -429,38 +373,21 @@ class CallNotificationService : Service() {
 
 
     private fun wakeScreen() {
-        val wakeLock = (getSystemService(Context.POWER_SERVICE) as PowerManager).newWakeLock(
+        (getSystemService(Context.POWER_SERVICE) as PowerManager).newWakeLock(
             PowerManager.FULL_WAKE_LOCK or PowerManager.ACQUIRE_CAUSES_WAKEUP or PowerManager.ON_AFTER_RELEASE,
             "CallNotificationService:WakeLock"
-        )
-        try {
-            wakeLock.acquire(5000L)
-        } finally {
-            if (wakeLock.isHeld) wakeLock.release()
-        }
+        ).acquire(5000)
     }
 
     private suspend fun getBitmapFromURL(src: String): Bitmap? {
         return withContext(Dispatchers.IO) {
-            try {
-                val urlConnection = URL(src).openConnection() as HttpURLConnection
-                urlConnection.connectTimeout = 5000
-                urlConnection.readTimeout = 5000
-                val inputStream = urlConnection.inputStream
-                val bitmap = BitmapFactory.decodeStream(inputStream)
-                inputStream.close()
-                urlConnection.disconnect()
-                bitmap
-            } catch (e: Exception) {
-                Log.e("CallNotificationService", "Failed to fetch bitmap", e)
-                null
-            }
+            try { BitmapFactory.decodeStream(URL(src).openConnection().getInputStream()) }
+            catch (e: Exception) { null }
         }
     }
 
     private fun isAppInForeground(): Boolean {
-        val activityManager =
-            getSystemService(Context.ACTIVITY_SERVICE) as android.app.ActivityManager
+        val activityManager = getSystemService(Context.ACTIVITY_SERVICE) as android.app.ActivityManager
         val runningTasks = activityManager.runningAppProcesses ?: return false
 
         for (task in runningTasks) {
