@@ -23,9 +23,6 @@ import io.flutter.plugin.common.MethodChannel.Result
 import org.json.JSONObject
 import android.content.BroadcastReceiver
 import android.content.IntentFilter
-import io.flutter.embedding.engine.FlutterEngine
-import io.flutter.embedding.engine.FlutterEngineCache
-import io.flutter.embedding.engine.dart.DartEntrypoint
 
 
 class ZastroAndroidCallNotificationsPlugin : FlutterPlugin, MethodCallHandler, ActivityAware {
@@ -39,25 +36,9 @@ class ZastroAndroidCallNotificationsPlugin : FlutterPlugin, MethodCallHandler, A
   private var activity: Activity? = null
   private var latestNotificationData: Map<String, Any?>? = null
 
-  private var flutterEngine: FlutterEngine? = null
-
   override fun onAttachedToEngine(@NonNull binding: FlutterPlugin.FlutterPluginBinding) {
     Log.d("FlutterCallkitIncoming", "onAttachedToEngine called")
     context = binding.applicationContext
-
-    flutterEngine = FlutterEngineCache.getInstance().get("flutter_engine_cache_key")
-
-    if (flutterEngine == null) {
-      flutterEngine = FlutterEngine(context)
-      flutterEngine?.dartExecutor?.executeDartEntrypoint(
-        FlutterEngine.DartEntrypoint.createDefault()
-      )
-      FlutterEngineCache.getInstance().put("flutter_engine_cache_key", flutterEngine)
-      Log.d("ZastroPlugin", "FlutterEngine initialized and cached.")
-    } else {
-      Log.d("ZastroPlugin", "Using cached FlutterEngine.")
-    }
-
     channel = MethodChannel(binding.binaryMessenger, "Chat notifications")
     channel.setMethodCallHandler(this)
 
@@ -330,11 +311,5 @@ class ZastroAndroidCallNotificationsPlugin : FlutterPlugin, MethodCallHandler, A
 //    callTimerChannel.setMethodCallHandler(null)
 //    ongoingCallChannel.setMethodCallHandler(null)
     MethodChannelHelper.dispose()
-    flutterEngine?.let {
-      // Optionally you can also call dispose() if you want to clean up
-      it.destroy()
-      FlutterEngineCache.getInstance().remove("flutter_engine_cache_key")
-      Log.d("ZastroPlugin", "FlutterEngine disposed and removed from cache.")
-    }
   }
 }
