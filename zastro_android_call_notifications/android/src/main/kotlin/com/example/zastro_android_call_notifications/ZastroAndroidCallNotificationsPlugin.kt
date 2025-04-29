@@ -23,9 +23,6 @@ import io.flutter.plugin.common.MethodChannel.Result
 import org.json.JSONObject
 import android.content.BroadcastReceiver
 import android.content.IntentFilter
-import io.flutter.embedding.engine.FlutterEngine
-import io.flutter.embedding.engine.FlutterEngineCache
-import io.flutter.embedding.engine.dart.DartExecutor
 
 
 class ZastroAndroidCallNotificationsPlugin : FlutterPlugin, MethodCallHandler, ActivityAware {
@@ -38,33 +35,10 @@ class ZastroAndroidCallNotificationsPlugin : FlutterPlugin, MethodCallHandler, A
   private lateinit var callOngoingReceiver: CallOngoingTimeNotificationReceiver
   private var activity: Activity? = null
   private var latestNotificationData: Map<String, Any?>? = null
-  private var flutterEngine: FlutterEngine? = null
-  private val engineCacheKey = "flutter_engine"
 
   override fun onAttachedToEngine(@NonNull binding: FlutterPlugin.FlutterPluginBinding) {
     Log.d("FlutterCallkitIncoming", "onAttachedToEngine called")
     context = binding.applicationContext
-
-    flutterEngine = FlutterEngineCache.getInstance().get(engineCacheKey)
-
-    if (flutterEngine == null) {
-      flutterEngine = FlutterEngine(context)
-      flutterEngine?.let {
-        // Initialize Flutter engine with default settings
-        it.navigationChannel.setInitialRoute("/")
-        it.dartExecutor.executeDartEntrypoint(
-          DartExecutor.DartEntrypoint.createDefault()
-        )
-
-        // Cache the engine
-        FlutterEngineCache.getInstance().put(engineCacheKey, it)
-        Log.d("ZastroPlugin", "Flutter engine initialized and cached.")
-      }
-    } else {
-      Log.d("ZastroPlugin", "Using cached Flutter engine.")
-    }
-
-
     channel = MethodChannel(binding.binaryMessenger, "Chat notifications")
     channel.setMethodCallHandler(this)
 
@@ -154,102 +128,45 @@ class ZastroAndroidCallNotificationsPlugin : FlutterPlugin, MethodCallHandler, A
         }
 
         "startOngoingCallNotification" -> {
-          try {
-            if (!::context.isInitialized || context == null) {
-              Log.e("ZastroPlugin", "Context not initialized or null.")
-              result.error("CONTEXT_ERROR", "Context is not initialized", null)
-              return
-            }
-
-            val seconds = call.argument<Int>("call_duration_seconds") ?: 0
-            val intent = Intent("${context.packageName}.com.example.zastro_android_call_notifications.START_CALL_NOTIFICATION").apply {
-              putExtra("call_duration_seconds", seconds)
-              setPackage(context.packageName)
-            }
-
-            context.sendBroadcast(intent)
-            result.success("START_CALL_NOTIFICATION broadcast sent!")
-
-          } catch (e: Exception) {
-            Log.e("ZastroPlugin", "Exception in startOngoingCallNotification: ${e.message}")
-            result.error("PLUGIN_ERROR", e.message, null)
+          val seconds = call.argument<Int>("call_duration_seconds") ?: 0
+          val intent = Intent("${context.packageName}.com.example.zastro_android_call_notifications.START_CALL_NOTIFICATION").apply {
+            putExtra("call_duration_seconds", seconds)
           }
+          intent.setPackage(context.packageName)
+          context.sendBroadcast(intent)
+          result.success("START_CALL_NOTIFICATION broadcast sent!")
         }
 
         "startMicNotification" -> {
-          try {
-            if (!::context.isInitialized || context == null) {
-              Log.e("ZastroPlugin", "Context not initialized for startMicNotification")
-              result.error("CONTEXT_ERROR", "Context is not initialized", null)
-              return
-            }
-            val intent = Intent("${context.packageName}.com.example.zastro_android_call_notifications.START_MICROPHONE_NOTIFICATION").apply {
-              setPackage(context.packageName)
-            }
-            context.sendBroadcast(intent)
-            result.success("START_MICROPHONE_NOTIFICATION broadcast sent!")
-          } catch (e: Exception) {
-            Log.e("ZastroPlugin", "Exception in startMicNotification: ${e.message}")
-            result.error("PLUGIN_ERROR", e.message, null)
-          }
+          val intent = Intent("${context.packageName}.com.example.zastro_android_call_notifications.START_MICROPHONE_NOTIFICATION")
+          intent.setPackage(context.packageName)
+          context.sendBroadcast(intent)
+          result.success("START_MICROPHONE_NOTIFICATION broadcast sent!")
         }
 
         "updateCallDuration" -> {
-          try {
-            if (!::context.isInitialized || context == null) {
-              Log.e("ZastroPlugin", "Context not initialized for updateCallDuration")
-              result.error("CONTEXT_ERROR", "Context is not initialized", null)
-              return
-            }
-            val seconds = call.argument<Int>("call_duration_seconds") ?: 0
-            val intent = Intent("${context.packageName}.com.example.zastro_android_call_notifications.UPDATE_CALL_NOTIFICATION").apply {
-              putExtra("call_duration_seconds", seconds)
-              setPackage(context.packageName)
-            }
-            context.sendBroadcast(intent)
-            result.success("UPDATE_CALL_NOTIFICATION broadcast sent!")
-          } catch (e: Exception) {
-            Log.e("ZastroPlugin", "Exception in updateCallDuration: ${e.message}")
-            result.error("PLUGIN_ERROR", e.message, null)
+          val seconds = call.argument<Int>("call_duration_seconds") ?: 0
+          val intent = Intent("${context.packageName}.com.example.zastro_android_call_notifications.UPDATE_CALL_NOTIFICATION").apply {
+            putExtra("call_duration_seconds", seconds)
           }
+          intent.setPackage(context.packageName)
+          context.sendBroadcast(intent)
+          result.success("UPDATE_CALL_NOTIFICATION broadcast sent!")
         }
 
         "stopOngoingCallNotification" -> {
-          try {
-            if (!::context.isInitialized || context == null) {
-              Log.e("ZastroPlugin", "Context not initialized for stopOngoingCallNotification")
-              result.error("CONTEXT_ERROR", "Context is not initialized", null)
-              return
-            }
-            val intent = Intent("${context.packageName}.com.example.zastro_android_call_notifications.STOP_CALL_NOTIFICATION").apply {
-              setPackage(context.packageName)
-            }
-            context.sendBroadcast(intent)
-            result.success("STOP_CALL_NOTIFICATION broadcast sent!")
-          } catch (e: Exception) {
-            Log.e("ZastroPlugin", "Exception in stopOngoingCallNotification: ${e.message}")
-            result.error("PLUGIN_ERROR", e.message, null)
-          }
+          val intent = Intent("${context.packageName}.com.example.zastro_android_call_notifications.STOP_CALL_NOTIFICATION")
+          intent.setPackage(context.packageName)
+          context.sendBroadcast(intent)
+          result.success("STOP_CALL_NOTIFICATION broadcast sent!")
         }
 
         "stopMicNotification" -> {
-          try {
-            if (!::context.isInitialized || context == null) {
-              Log.e("ZastroPlugin", "Context not initialized for stopMicNotification")
-              result.error("CONTEXT_ERROR", "Context is not initialized", null)
-              return
-            }
-            val intent = Intent("${context.packageName}.com.example.zastro_android_call_notifications.STOP_MIC_NOTIFICATION").apply {
-              setPackage(context.packageName)
-            }
-            context.sendBroadcast(intent)
-            result.success("STOP_MIC_NOTIFICATION broadcast sent!")
-          } catch (e: Exception) {
-            Log.e("ZastroPlugin", "Exception in stopMicNotification: ${e.message}")
-            result.error("PLUGIN_ERROR", e.message, null)
-          }
+          val intent = Intent("${context.packageName}.com.example.zastro_android_call_notifications.STOP_MIC_NOTIFICATION")
+          intent.setPackage(context.packageName)
+          context.sendBroadcast(intent)
+          result.success("STOP_MIC_NOTIFICATION broadcast sent!")
         }
-
 
         else -> result.notImplemented()
       }
@@ -292,7 +209,7 @@ class ZastroAndroidCallNotificationsPlugin : FlutterPlugin, MethodCallHandler, A
     }
     handleIntent(binding.activity.intent)
 
-    /*// Register all broadcast receivers
+    // Register all broadcast receivers
     callReceiver = CallReceiver()
     val callFilter = IntentFilter().apply {
       addAction("${context.packageName}.com.example.zastro_android_call_notifications.SHOW_CALL_NOTIFICATION")
@@ -332,7 +249,7 @@ class ZastroAndroidCallNotificationsPlugin : FlutterPlugin, MethodCallHandler, A
     } else {
       @Suppress("DEPRECATION")
       context.registerReceiver(callOngoingReceiver, ongoingFilter)
-    }*/
+    }
   }
 
   private fun handleIntent(intent: Intent?) {
@@ -363,7 +280,7 @@ class ZastroAndroidCallNotificationsPlugin : FlutterPlugin, MethodCallHandler, A
   override fun onDetachedFromActivity() {
     activity = null
 
-    /*try {
+    try {
       context.unregisterReceiver(callReceiver)
     } catch (e: Exception) {
       Log.w("ZastroPlugin", "CallReceiver already unregistered or not registered: ${e.message}")
@@ -377,7 +294,7 @@ class ZastroAndroidCallNotificationsPlugin : FlutterPlugin, MethodCallHandler, A
       context.unregisterReceiver(callOngoingReceiver)
     } catch (e: Exception) {
       Log.w("ZastroPlugin", "CallOngoingReceiver already unregistered or not registered: ${e.message}")
-    }*/
+    }
   }
 
   override fun onReattachedToActivityForConfigChanges(binding: ActivityPluginBinding) {
@@ -394,6 +311,5 @@ class ZastroAndroidCallNotificationsPlugin : FlutterPlugin, MethodCallHandler, A
 //    callTimerChannel.setMethodCallHandler(null)
 //    ongoingCallChannel.setMethodCallHandler(null)
     MethodChannelHelper.dispose()
-    flutterEngine?.destroy()
   }
 }
