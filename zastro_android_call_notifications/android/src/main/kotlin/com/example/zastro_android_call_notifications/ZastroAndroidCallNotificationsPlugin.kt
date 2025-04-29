@@ -24,6 +24,9 @@ import org.json.JSONObject
 import android.content.BroadcastReceiver
 import android.content.IntentFilter
 
+import android.os.Handler
+import android.os.Looper
+
 
 class ZastroAndroidCallNotificationsPlugin : FlutterPlugin, MethodCallHandler, ActivityAware {
   private lateinit var context: Context
@@ -143,12 +146,12 @@ class ZastroAndroidCallNotificationsPlugin : FlutterPlugin, MethodCallHandler, A
         }
 
         "startMicNotification" -> {
-          val isForeground = isAppInForeground(context)
-          if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.UPSIDE_DOWN_CAKE && !isForeground) {
-            Log.w("MethodChannelHandler", "Skipped mic service start — Android 14+ + app not foreground")
-            result.success("Skipped starting CallForegroundService due to Android 14+ foreground restriction.")
-            return@setMethodCallHandler
-          }
+//          val isForeground = isAppInForeground(context)
+//          if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.UPSIDE_DOWN_CAKE && !isForeground) {
+//            Log.w("MethodChannelHandler", "Skipped mic service start — Android 14+ + app not foreground")
+//            result.success("Skipped starting CallForegroundService due to Android 14+ foreground restriction.")
+//            return@setMethodCallHandler
+//          }
 
           val micIntent = Intent(context, CallForegroundService::class.java)
           Handler(Looper.getMainLooper()).postDelayed({
