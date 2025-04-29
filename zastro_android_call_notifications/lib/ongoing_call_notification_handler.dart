@@ -123,7 +123,7 @@ class OngoingCallNotificationHandler {
     }
   }*/
 
-  static const MethodChannel _ongoingCallChannel = MethodChannel('zastro_android_call_notifications');
+  static const MethodChannel _ongoingCallChannel = MethodChannel('Chat notifications');
 
   static Future<void> startOnGoingCallNotification(int seconds) async {
     try {

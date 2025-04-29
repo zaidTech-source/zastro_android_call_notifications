@@ -7,7 +7,7 @@ import 'package:flutter/foundation.dart';
 import 'notification_storage_helper.dart';
 
 class ChatNotificationPlugin {
-  static const MethodChannel _channel = MethodChannel('zastro_android_call_notifications');
+  static const MethodChannel _channel = MethodChannel('Chat notifications');
 
   static Future<void> showCallNotification(Map<String, dynamic> data) async {
     try {
