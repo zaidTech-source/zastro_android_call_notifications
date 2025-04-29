@@ -125,6 +125,10 @@ class OngoingCallNotificationHandler {
 
   static const MethodChannel _ongoingCallChannel = MethodChannel('Chat notifications');
 
+  static Future<void> initialize() async {
+    await _ongoingCallChannel.invokeMethod('initialize');
+  }
+
   static Future<void> startOnGoingCallNotification(int seconds) async {
     try {
       await _ongoingCallChannel.invokeMethod('startOngoingCallNotification', {
