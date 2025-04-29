@@ -24,15 +24,12 @@ import org.json.JSONObject
 import android.content.BroadcastReceiver
 import android.content.IntentFilter
 
-import android.os.Handler
-import android.os.Looper
-
 
 class ZastroAndroidCallNotificationsPlugin : FlutterPlugin, MethodCallHandler, ActivityAware {
   private lateinit var context: Context
   private lateinit var channel: MethodChannel
-  private lateinit var callTimerChannel: MethodChannel
-  private lateinit var ongoingCallChannel: MethodChannel
+//  private lateinit var callTimerChannel: MethodChannel
+//  private lateinit var ongoingCallChannel: MethodChannel
   private lateinit var callReceiver: CallReceiver
   private lateinit var callActionReceiver: CallActionReceiver
   private lateinit var callOngoingReceiver: CallOngoingTimeNotificationReceiver
@@ -42,14 +39,14 @@ class ZastroAndroidCallNotificationsPlugin : FlutterPlugin, MethodCallHandler, A
   override fun onAttachedToEngine(@NonNull binding: FlutterPlugin.FlutterPluginBinding) {
     Log.d("FlutterCallkitIncoming", "onAttachedToEngine called")
     context = binding.applicationContext
-    channel = MethodChannel(binding.binaryMessenger, "Chat notifications")
+    channel = MethodChannel(binding.binaryMessenger, "zastro_android_call_notifications")
     channel.setMethodCallHandler(this)
 
-    callTimerChannel = MethodChannel(binding.binaryMessenger, "Call Timer")
-    callTimerChannel.setMethodCallHandler(this)
+//    callTimerChannel = MethodChannel(binding.binaryMessenger, "Call Timer")
+//    callTimerChannel.setMethodCallHandler(this)
 
-    ongoingCallChannel = MethodChannel(binding.binaryMessenger, "Ongoing Call Notifications")
-    ongoingCallChannel.setMethodCallHandler(this)
+//    ongoingCallChannel = MethodChannel(binding.binaryMessenger, "Ongoing Call Notifications")
+//    ongoingCallChannel.setMethodCallHandler(this)
 
     MethodChannelHelper.setMethodChannel(channel)
   }
@@ -132,51 +129,29 @@ class ZastroAndroidCallNotificationsPlugin : FlutterPlugin, MethodCallHandler, A
 
         "startOngoingCallNotification" -> {
           val seconds = call.argument<Int>("call_duration_seconds") ?: 0
-          val serviceIntent = Intent(context, CallTimerService::class.java).apply {
-            putExtra("initial_seconds", seconds)
+          val intent = Intent("${context.packageName}.com.example.zastro_android_call_notifications.START_CALL_NOTIFICATION").apply {
+            putExtra("call_duration_seconds", seconds)
           }
-          Handler(Looper.getMainLooper()).postDelayed({
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-              context.startForegroundService(serviceIntent)
-            } else {
-              context.startService(serviceIntent)
-            }
-          }, 500)
-          result.success("CallTimerService started directly!")
+          intent.setPackage(context.packageName)
+          context.sendBroadcast(intent)
+          result.success("START_CALL_NOTIFICATION broadcast sent!")
         }
 
         "startMicNotification" -> {
-//          val isForeground = isAppInForeground(context)
-//          if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.UPSIDE_DOWN_CAKE && !isForeground) {
-//            Log.w("MethodChannelHandler", "Skipped mic service start — Android 14+ + app not foreground")
-//            result.success("Skipped starting CallForegroundService due to Android 14+ foreground restriction.")
-//            return@setMethodCallHandler
-//          }
-
-          val micIntent = Intent(context, CallForegroundService::class.java)
-          Handler(Looper.getMainLooper()).postDelayed({
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-              context.startForegroundService(micIntent)
-            } else {
-              context.startService(micIntent)
-            }
-          }, 500)
-          result.success("CallForegroundService started directly!")
+          val intent = Intent("${context.packageName}.com.example.zastro_android_call_notifications.START_MICROPHONE_NOTIFICATION")
+          intent.setPackage(context.packageName)
+          context.sendBroadcast(intent)
+          result.success("START_MICROPHONE_NOTIFICATION broadcast sent!")
         }
 
         "updateCallDuration" -> {
           val seconds = call.argument<Int>("call_duration_seconds") ?: 0
-          Log.d("MethodChannelHandler", "Updating call notification: $seconds seconds")
-          if (CallTimerService.instance?.isRunning == true) {
-            CallTimerService.updateCallDuration(seconds)
-          } else {
-            Log.d("MethodChannelHandler", "CallTimerService not running, stopping and clearing notification")
-            val stopIntent = Intent(context, CallTimerService::class.java)
-            context.stopService(stopIntent)
-            val notificationManager = context.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
-            notificationManager.cancel(CallTimerService.CALL_NOTIFICATION_ID)
+          val intent = Intent("${context.packageName}.com.example.zastro_android_call_notifications.UPDATE_CALL_NOTIFICATION").apply {
+            putExtra("call_duration_seconds", seconds)
           }
-          result.success("Call duration update handled!")
+          intent.setPackage(context.packageName)
+          context.sendBroadcast(intent)
+          result.success("UPDATE_CALL_NOTIFICATION broadcast sent!")
         }
 
         "stopOngoingCallNotification" -> {
@@ -333,8 +308,8 @@ class ZastroAndroidCallNotificationsPlugin : FlutterPlugin, MethodCallHandler, A
   override fun onDetachedFromEngine(@NonNull binding: FlutterPlugin.FlutterPluginBinding) {
     Log.d("FlutterCallkitIncoming", "onDetachedFromEngine called")
     channel.setMethodCallHandler(null)
-    callTimerChannel.setMethodCallHandler(null)
-    ongoingCallChannel.setMethodCallHandler(null)
+//    callTimerChannel.setMethodCallHandler(null)
+//    ongoingCallChannel.setMethodCallHandler(null)
     MethodChannelHelper.dispose()
   }
 }
