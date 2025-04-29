@@ -60,6 +60,10 @@ class ZastroAndroidCallNotificationsPlugin : FlutterPlugin, MethodCallHandler, A
         FlutterEngineCache.getInstance().put(engineCacheKey, it)
         Log.d("ZastroPlugin", "Flutter engine initialized and cached.")
       }
+    } else {
+      Log.d("ZastroPlugin", "Using cached Flutter engine.")
+    }
+
 
     channel = MethodChannel(binding.binaryMessenger, "Chat notifications")
     channel.setMethodCallHandler(this)
