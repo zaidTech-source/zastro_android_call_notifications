@@ -23,6 +23,8 @@ import io.flutter.plugin.common.MethodChannel.Result
 import org.json.JSONObject
 import android.content.BroadcastReceiver
 import android.content.IntentFilter
+import io.flutter.embedding.engine.FlutterEngine
+import io.flutter.embedding.engine.FlutterEngineCache
 
 
 class ZastroAndroidCallNotificationsPlugin : FlutterPlugin, MethodCallHandler, ActivityAware {
@@ -36,9 +38,25 @@ class ZastroAndroidCallNotificationsPlugin : FlutterPlugin, MethodCallHandler, A
   private var activity: Activity? = null
   private var latestNotificationData: Map<String, Any?>? = null
 
+  private var flutterEngine: FlutterEngine? = null
+
   override fun onAttachedToEngine(@NonNull binding: FlutterPlugin.FlutterPluginBinding) {
     Log.d("FlutterCallkitIncoming", "onAttachedToEngine called")
     context = binding.applicationContext
+
+    flutterEngine = FlutterEngineCache.getInstance().get("flutter_engine_cache_key")
+
+    if (flutterEngine == null) {
+      flutterEngine = FlutterEngine(context)
+      flutterEngine?.dartExecutor?.executeDartEntrypoint(
+        FlutterEngine.DartEntrypoint.createDefault()
+      )
+      FlutterEngineCache.getInstance().put("flutter_engine_cache_key", flutterEngine)
+      Log.d("ZastroPlugin", "FlutterEngine initialized and cached.")
+    } else {
+      Log.d("ZastroPlugin", "Using cached FlutterEngine.")
+    }
+
     channel = MethodChannel(binding.binaryMessenger, "Chat notifications")
     channel.setMethodCallHandler(this)
 
@@ -209,7 +227,7 @@ class ZastroAndroidCallNotificationsPlugin : FlutterPlugin, MethodCallHandler, A
     }
     handleIntent(binding.activity.intent)
 
-    // Register all broadcast receivers
+    /*// Register all broadcast receivers
     callReceiver = CallReceiver()
     val callFilter = IntentFilter().apply {
       addAction("${context.packageName}.com.example.zastro_android_call_notifications.SHOW_CALL_NOTIFICATION")
@@ -249,7 +267,7 @@ class ZastroAndroidCallNotificationsPlugin : FlutterPlugin, MethodCallHandler, A
     } else {
       @Suppress("DEPRECATION")
       context.registerReceiver(callOngoingReceiver, ongoingFilter)
-    }
+    }*/
   }
 
   private fun handleIntent(intent: Intent?) {
@@ -280,7 +298,7 @@ class ZastroAndroidCallNotificationsPlugin : FlutterPlugin, MethodCallHandler, A
   override fun onDetachedFromActivity() {
     activity = null
 
-    try {
+    /*try {
       context.unregisterReceiver(callReceiver)
     } catch (e: Exception) {
       Log.w("ZastroPlugin", "CallReceiver already unregistered or not registered: ${e.message}")
@@ -294,7 +312,7 @@ class ZastroAndroidCallNotificationsPlugin : FlutterPlugin, MethodCallHandler, A
       context.unregisterReceiver(callOngoingReceiver)
     } catch (e: Exception) {
       Log.w("ZastroPlugin", "CallOngoingReceiver already unregistered or not registered: ${e.message}")
-    }
+    }*/
   }
 
   override fun onReattachedToActivityForConfigChanges(binding: ActivityPluginBinding) {
@@ -311,5 +329,11 @@ class ZastroAndroidCallNotificationsPlugin : FlutterPlugin, MethodCallHandler, A
 //    callTimerChannel.setMethodCallHandler(null)
 //    ongoingCallChannel.setMethodCallHandler(null)
     MethodChannelHelper.dispose()
+    flutterEngine?.let {
+      // Optionally you can also call dispose() if you want to clean up
+      it.destroy()
+      FlutterEngineCache.getInstance().remove("flutter_engine_cache_key")
+      Log.d("ZastroPlugin", "FlutterEngine disposed and removed from cache.")
+    }
   }
 }
