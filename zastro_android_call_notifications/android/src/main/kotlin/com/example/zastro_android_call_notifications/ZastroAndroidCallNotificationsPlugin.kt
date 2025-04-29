@@ -133,15 +133,23 @@ class ZastroAndroidCallNotificationsPlugin : FlutterPlugin, MethodCallHandler, A
             putExtra("call_duration_seconds", seconds)
           }
           intent.setPackage(context.packageName)
-          context.sendBroadcast(intent)
-          result.success("START_CALL_NOTIFICATION broadcast sent!")
+          if (isAppInForeground(context)) {
+            context.sendBroadcast(intent)
+            result.success("START_CALL_NOTIFICATION broadcast sent!")
+          } else {
+            Log.w("ZastroPlugin", "Skipping broadcast: App not in foreground")
+          }
         }
 
         "startMicNotification" -> {
           val intent = Intent("${context.packageName}.com.example.zastro_android_call_notifications.START_MICROPHONE_NOTIFICATION")
           intent.setPackage(context.packageName)
-          context.sendBroadcast(intent)
-          result.success("START_MICROPHONE_NOTIFICATION broadcast sent!")
+          if (isAppInForeground(context)) {
+            context.sendBroadcast(intent)
+            result.success("START_MICROPHONE_NOTIFICATION broadcast sent!")
+          } else {
+            Log.w("ZastroPlugin", "Skipping broadcast: App not in foreground")
+          }
         }
 
         "updateCallDuration" -> {
@@ -150,22 +158,34 @@ class ZastroAndroidCallNotificationsPlugin : FlutterPlugin, MethodCallHandler, A
             putExtra("call_duration_seconds", seconds)
           }
           intent.setPackage(context.packageName)
-          context.sendBroadcast(intent)
-          result.success("UPDATE_CALL_NOTIFICATION broadcast sent!")
+          if (isAppInForeground(context)) {
+            context.sendBroadcast(intent)
+            result.success("UPDATE_CALL_NOTIFICATION broadcast sent!")
+          } else {
+            Log.w("ZastroPlugin", "Skipping broadcast: App not in foreground")
+          }
         }
 
         "stopOngoingCallNotification" -> {
           val intent = Intent("${context.packageName}.com.example.zastro_android_call_notifications.STOP_CALL_NOTIFICATION")
           intent.setPackage(context.packageName)
-          context.sendBroadcast(intent)
-          result.success("STOP_CALL_NOTIFICATION broadcast sent!")
+          if (isAppInForeground(context)) {
+            context.sendBroadcast(intent)
+            result.success("STOP_CALL_NOTIFICATION broadcast sent!")
+          } else {
+            Log.w("ZastroPlugin", "Skipping broadcast: App not in foreground")
+          }
         }
 
         "stopMicNotification" -> {
           val intent = Intent("${context.packageName}.com.example.zastro_android_call_notifications.STOP_MIC_NOTIFICATION")
           intent.setPackage(context.packageName)
-          context.sendBroadcast(intent)
-          result.success("STOP_MIC_NOTIFICATION broadcast sent!")
+          if (isAppInForeground(context)) {
+            context.sendBroadcast(intent)
+            result.success("STOP_MIC_NOTIFICATION broadcast sent!")
+          } else {
+            Log.w("ZastroPlugin", "Skipping broadcast: App not in foreground")
+          }
         }
 
         else -> result.notImplemented()
@@ -311,5 +331,11 @@ class ZastroAndroidCallNotificationsPlugin : FlutterPlugin, MethodCallHandler, A
 //    callTimerChannel.setMethodCallHandler(null)
 //    ongoingCallChannel.setMethodCallHandler(null)
     MethodChannelHelper.dispose()
+  }
+
+  private fun isAppInForeground(context: Context): Boolean {
+    val activityManager = context.getSystemService(Context.ACTIVITY_SERVICE) as ActivityManager
+    val runningProcesses = activityManager.runningAppProcesses ?: return false
+    return runningProcesses.any { it.processName == context.packageName && it.importance == ActivityManager.RunningAppProcessInfo.IMPORTANCE_FOREGROUND }
   }
 }
