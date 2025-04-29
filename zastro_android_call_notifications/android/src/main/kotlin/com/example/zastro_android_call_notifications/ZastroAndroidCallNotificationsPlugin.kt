@@ -23,6 +23,9 @@ import io.flutter.plugin.common.MethodChannel.Result
 import org.json.JSONObject
 import android.content.BroadcastReceiver
 import android.content.IntentFilter
+import io.flutter.embedding.engine.FlutterEngine
+import io.flutter.embedding.engine.FlutterEngineCache
+import io.flutter.embedding.engine.dart.DartExecutor
 
 
 class ZastroAndroidCallNotificationsPlugin : FlutterPlugin, MethodCallHandler, ActivityAware {
@@ -35,10 +38,29 @@ class ZastroAndroidCallNotificationsPlugin : FlutterPlugin, MethodCallHandler, A
   private lateinit var callOngoingReceiver: CallOngoingTimeNotificationReceiver
   private var activity: Activity? = null
   private var latestNotificationData: Map<String, Any?>? = null
+  private var flutterEngine: FlutterEngine? = null
+  private val engineCacheKey = "flutter_engine"
 
   override fun onAttachedToEngine(@NonNull binding: FlutterPlugin.FlutterPluginBinding) {
     Log.d("FlutterCallkitIncoming", "onAttachedToEngine called")
     context = binding.applicationContext
+
+    flutterEngine = FlutterEngineCache.getInstance().get(engineCacheKey)
+
+    if (flutterEngine == null) {
+      flutterEngine = FlutterEngine(context)
+      flutterEngine?.let {
+        // Initialize Flutter engine with default settings
+        it.navigationChannel.setInitialRoute("/")
+        it.dartExecutor.executeDartEntrypoint(
+          DartExecutor.DartEntrypoint.createDefault()
+        )
+
+        // Cache the engine
+        FlutterEngineCache.getInstance().put(engineCacheKey, it)
+        Log.d("ZastroPlugin", "Flutter engine initialized and cached.")
+      }
+
     channel = MethodChannel(binding.binaryMessenger, "Chat notifications")
     channel.setMethodCallHandler(this)
 
@@ -368,5 +390,6 @@ class ZastroAndroidCallNotificationsPlugin : FlutterPlugin, MethodCallHandler, A
 //    callTimerChannel.setMethodCallHandler(null)
 //    ongoingCallChannel.setMethodCallHandler(null)
     MethodChannelHelper.dispose()
+    flutterEngine?.destroy()
   }
 }
