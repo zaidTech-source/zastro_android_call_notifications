@@ -23,7 +23,6 @@ import io.flutter.plugin.common.MethodChannel.Result
 import org.json.JSONObject
 import android.content.BroadcastReceiver
 import android.content.IntentFilter
-import android.app.ActivityManager
 
 
 class ZastroAndroidCallNotificationsPlugin : FlutterPlugin, MethodCallHandler, ActivityAware {
@@ -129,65 +128,102 @@ class ZastroAndroidCallNotificationsPlugin : FlutterPlugin, MethodCallHandler, A
         }
 
         "startOngoingCallNotification" -> {
-          val seconds = call.argument<Int>("call_duration_seconds") ?: 0
-          val intent = Intent("${context.packageName}.com.example.zastro_android_call_notifications.START_CALL_NOTIFICATION").apply {
-            putExtra("call_duration_seconds", seconds)
-          }
-          intent.setPackage(context.packageName)
-          if (isAppInForeground(context)) {
+          try {
+            if (!::context.isInitialized || context == null) {
+              Log.e("ZastroPlugin", "Context not initialized or null.")
+              result.error("CONTEXT_ERROR", "Context is not initialized", null)
+              return@setMethodCallHandler
+            }
+
+            val seconds = call.argument<Int>("call_duration_seconds") ?: 0
+            val intent = Intent("${context.packageName}.com.example.zastro_android_call_notifications.START_CALL_NOTIFICATION").apply {
+              putExtra("call_duration_seconds", seconds)
+              setPackage(context.packageName)
+            }
+
             context.sendBroadcast(intent)
             result.success("START_CALL_NOTIFICATION broadcast sent!")
-          } else {
-            Log.w("ZastroPlugin", "Skipping broadcast: App not in foreground")
+
+          } catch (e: Exception) {
+            Log.e("ZastroPlugin", "Exception in startOngoingCallNotification: ${e.message}")
+            result.error("PLUGIN_ERROR", e.message, null)
           }
         }
 
         "startMicNotification" -> {
-          val intent = Intent("${context.packageName}.com.example.zastro_android_call_notifications.START_MICROPHONE_NOTIFICATION")
-          intent.setPackage(context.packageName)
-          if (isAppInForeground(context)) {
+          try {
+            if (!::context.isInitialized || context == null) {
+              Log.e("ZastroPlugin", "Context not initialized for startMicNotification")
+              result.error("CONTEXT_ERROR", "Context is not initialized", null)
+              return@setMethodCallHandler
+            }
+            val intent = Intent("${context.packageName}.com.example.zastro_android_call_notifications.START_MICROPHONE_NOTIFICATION").apply {
+              setPackage(context.packageName)
+            }
             context.sendBroadcast(intent)
             result.success("START_MICROPHONE_NOTIFICATION broadcast sent!")
-          } else {
-            Log.w("ZastroPlugin", "Skipping broadcast: App not in foreground")
+          } catch (e: Exception) {
+            Log.e("ZastroPlugin", "Exception in startMicNotification: ${e.message}")
+            result.error("PLUGIN_ERROR", e.message, null)
           }
         }
 
         "updateCallDuration" -> {
-          val seconds = call.argument<Int>("call_duration_seconds") ?: 0
-          val intent = Intent("${context.packageName}.com.example.zastro_android_call_notifications.UPDATE_CALL_NOTIFICATION").apply {
-            putExtra("call_duration_seconds", seconds)
-          }
-          intent.setPackage(context.packageName)
-          if (isAppInForeground(context)) {
+          try {
+            if (!::context.isInitialized || context == null) {
+              Log.e("ZastroPlugin", "Context not initialized for updateCallDuration")
+              result.error("CONTEXT_ERROR", "Context is not initialized", null)
+              return@setMethodCallHandler
+            }
+            val seconds = call.argument<Int>("call_duration_seconds") ?: 0
+            val intent = Intent("${context.packageName}.com.example.zastro_android_call_notifications.UPDATE_CALL_NOTIFICATION").apply {
+              putExtra("call_duration_seconds", seconds)
+              setPackage(context.packageName)
+            }
             context.sendBroadcast(intent)
             result.success("UPDATE_CALL_NOTIFICATION broadcast sent!")
-          } else {
-            Log.w("ZastroPlugin", "Skipping broadcast: App not in foreground")
+          } catch (e: Exception) {
+            Log.e("ZastroPlugin", "Exception in updateCallDuration: ${e.message}")
+            result.error("PLUGIN_ERROR", e.message, null)
           }
         }
 
         "stopOngoingCallNotification" -> {
-          val intent = Intent("${context.packageName}.com.example.zastro_android_call_notifications.STOP_CALL_NOTIFICATION")
-          intent.setPackage(context.packageName)
-          if (isAppInForeground(context)) {
+          try {
+            if (!::context.isInitialized || context == null) {
+              Log.e("ZastroPlugin", "Context not initialized for stopOngoingCallNotification")
+              result.error("CONTEXT_ERROR", "Context is not initialized", null)
+              return@setMethodCallHandler
+            }
+            val intent = Intent("${context.packageName}.com.example.zastro_android_call_notifications.STOP_CALL_NOTIFICATION").apply {
+              setPackage(context.packageName)
+            }
             context.sendBroadcast(intent)
             result.success("STOP_CALL_NOTIFICATION broadcast sent!")
-          } else {
-            Log.w("ZastroPlugin", "Skipping broadcast: App not in foreground")
+          } catch (e: Exception) {
+            Log.e("ZastroPlugin", "Exception in stopOngoingCallNotification: ${e.message}")
+            result.error("PLUGIN_ERROR", e.message, null)
           }
         }
 
         "stopMicNotification" -> {
-          val intent = Intent("${context.packageName}.com.example.zastro_android_call_notifications.STOP_MIC_NOTIFICATION")
-          intent.setPackage(context.packageName)
-          if (isAppInForeground(context)) {
+          try {
+            if (!::context.isInitialized || context == null) {
+              Log.e("ZastroPlugin", "Context not initialized for stopMicNotification")
+              result.error("CONTEXT_ERROR", "Context is not initialized", null)
+              return@setMethodCallHandler
+            }
+            val intent = Intent("${context.packageName}.com.example.zastro_android_call_notifications.STOP_MIC_NOTIFICATION").apply {
+              setPackage(context.packageName)
+            }
             context.sendBroadcast(intent)
             result.success("STOP_MIC_NOTIFICATION broadcast sent!")
-          } else {
-            Log.w("ZastroPlugin", "Skipping broadcast: App not in foreground")
+          } catch (e: Exception) {
+            Log.e("ZastroPlugin", "Exception in stopMicNotification: ${e.message}")
+            result.error("PLUGIN_ERROR", e.message, null)
           }
         }
+
 
         else -> result.notImplemented()
       }
@@ -332,11 +368,5 @@ class ZastroAndroidCallNotificationsPlugin : FlutterPlugin, MethodCallHandler, A
 //    callTimerChannel.setMethodCallHandler(null)
 //    ongoingCallChannel.setMethodCallHandler(null)
     MethodChannelHelper.dispose()
-  }
-
-  private fun isAppInForeground(context: Context): Boolean {
-    val activityManager = context.getSystemService(Context.ACTIVITY_SERVICE) as ActivityManager
-    val runningProcesses = activityManager.runningAppProcesses ?: return false
-    return runningProcesses.any { it.processName == context.packageName && it.importance == ActivityManager.RunningAppProcessInfo.IMPORTANCE_FOREGROUND }
   }
 }
