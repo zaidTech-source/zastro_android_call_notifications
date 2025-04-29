@@ -132,7 +132,7 @@ class ZastroAndroidCallNotificationsPlugin : FlutterPlugin, MethodCallHandler, A
             if (!::context.isInitialized || context == null) {
               Log.e("ZastroPlugin", "Context not initialized or null.")
               result.error("CONTEXT_ERROR", "Context is not initialized", null)
-              return@setMethodCallHandler
+              return
             }
 
             val seconds = call.argument<Int>("call_duration_seconds") ?: 0
@@ -155,7 +155,7 @@ class ZastroAndroidCallNotificationsPlugin : FlutterPlugin, MethodCallHandler, A
             if (!::context.isInitialized || context == null) {
               Log.e("ZastroPlugin", "Context not initialized for startMicNotification")
               result.error("CONTEXT_ERROR", "Context is not initialized", null)
-              return@setMethodCallHandler
+              return
             }
             val intent = Intent("${context.packageName}.com.example.zastro_android_call_notifications.START_MICROPHONE_NOTIFICATION").apply {
               setPackage(context.packageName)
@@ -173,7 +173,7 @@ class ZastroAndroidCallNotificationsPlugin : FlutterPlugin, MethodCallHandler, A
             if (!::context.isInitialized || context == null) {
               Log.e("ZastroPlugin", "Context not initialized for updateCallDuration")
               result.error("CONTEXT_ERROR", "Context is not initialized", null)
-              return@setMethodCallHandler
+              return
             }
             val seconds = call.argument<Int>("call_duration_seconds") ?: 0
             val intent = Intent("${context.packageName}.com.example.zastro_android_call_notifications.UPDATE_CALL_NOTIFICATION").apply {
@@ -193,7 +193,7 @@ class ZastroAndroidCallNotificationsPlugin : FlutterPlugin, MethodCallHandler, A
             if (!::context.isInitialized || context == null) {
               Log.e("ZastroPlugin", "Context not initialized for stopOngoingCallNotification")
               result.error("CONTEXT_ERROR", "Context is not initialized", null)
-              return@setMethodCallHandler
+              return
             }
             val intent = Intent("${context.packageName}.com.example.zastro_android_call_notifications.STOP_CALL_NOTIFICATION").apply {
               setPackage(context.packageName)
@@ -211,7 +211,7 @@ class ZastroAndroidCallNotificationsPlugin : FlutterPlugin, MethodCallHandler, A
             if (!::context.isInitialized || context == null) {
               Log.e("ZastroPlugin", "Context not initialized for stopMicNotification")
               result.error("CONTEXT_ERROR", "Context is not initialized", null)
-              return@setMethodCallHandler
+              return
             }
             val intent = Intent("${context.packageName}.com.example.zastro_android_call_notifications.STOP_MIC_NOTIFICATION").apply {
               setPackage(context.packageName)
