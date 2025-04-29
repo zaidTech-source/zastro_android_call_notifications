@@ -25,6 +25,7 @@ import android.content.BroadcastReceiver
 import android.content.IntentFilter
 import io.flutter.embedding.engine.FlutterEngine
 import io.flutter.embedding.engine.FlutterEngineCache
+import io.flutter.embedding.engine.dart.DartEntrypoint
 
 
 class ZastroAndroidCallNotificationsPlugin : FlutterPlugin, MethodCallHandler, ActivityAware {
