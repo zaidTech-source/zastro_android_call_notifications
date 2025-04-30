@@ -23,7 +23,6 @@ import io.flutter.plugin.common.MethodChannel.Result
 import org.json.JSONObject
 import android.content.BroadcastReceiver
 import android.content.IntentFilter
-import io.flutter.embedding.engine.FlutterEngineCache
 
 
 class ZastroAndroidCallNotificationsPlugin : FlutterPlugin, MethodCallHandler, ActivityAware {
@@ -40,15 +39,8 @@ class ZastroAndroidCallNotificationsPlugin : FlutterPlugin, MethodCallHandler, A
   override fun onAttachedToEngine(@NonNull binding: FlutterPlugin.FlutterPluginBinding) {
     Log.d("FlutterCallkitIncoming", "onAttachedToEngine called")
     context = binding.applicationContext
-    val engine = FlutterEngineCache.getInstance().get("my_engine_id")
-    if (engine != null) {
-      channel = MethodChannel(binding.binaryMessenger, "Chat notifications")
-      channel.setMethodCallHandler(this)
-      MethodChannelHelper.setMethodChannel(channel)
-    } else {
-      Log.d("FlutterCallkitIncoming", "Flutter Engine Null")
-    }
-
+    channel = MethodChannel(binding.binaryMessenger, "Chat notifications")
+    channel.setMethodCallHandler(this)
 
 //    callTimerChannel = MethodChannel(binding.binaryMessenger, "Call Timer")
 //    callTimerChannel.setMethodCallHandler(this)
@@ -56,7 +48,7 @@ class ZastroAndroidCallNotificationsPlugin : FlutterPlugin, MethodCallHandler, A
 //    ongoingCallChannel = MethodChannel(binding.binaryMessenger, "Ongoing Call Notifications")
 //    ongoingCallChannel.setMethodCallHandler(this)
 
-
+    MethodChannelHelper.setMethodChannel(channel)
   }
 
   override fun onMethodCall(@NonNull call: MethodCall, @NonNull result: Result) {
