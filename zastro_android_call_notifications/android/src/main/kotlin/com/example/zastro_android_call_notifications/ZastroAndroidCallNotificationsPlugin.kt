@@ -46,9 +46,7 @@ class ZastroAndroidCallNotificationsPlugin : FlutterPlugin, MethodCallHandler, A
       channel.setMethodCallHandler(this)
       MethodChannelHelper.setMethodChannel(channel)
     } else {
-      channel = MethodChannel(binding.binaryMessenger, "Chat notifications")
-      channel.setMethodCallHandler(this)
-      MethodChannelHelper.setMethodChannel(channel)
+      Log.d("FlutterCallkitIncoming", "Flutter Engine Null")
     }
 
 
