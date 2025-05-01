@@ -52,6 +52,7 @@ class ZastroAndroidCallNotificationsPlugin : FlutterPlugin, MethodCallHandler, A
   }
 
   override fun onMethodCall(@NonNull call: MethodCall, @NonNull result: Result) {
+    Log.d("IsolateCheck", "Kotlin MethodCall received on thread: ${Thread.currentThread().name}")
     try {
       when (call.method) {
         "initialize" -> {
