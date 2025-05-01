@@ -1,5 +1,6 @@
 import 'dart:convert';
 import 'dart:io';
+import 'dart:isolate';
 import 'package:flutter/foundation.dart';
 import 'package:android_intent_plus/android_intent.dart';
 import 'package:android_intent_plus/flag.dart';
@@ -127,6 +128,7 @@ class OngoingCallNotificationHandler {
 
 
   static Future<void> startOnGoingCallNotification(int seconds) async {
+    print('[Isolate] startOnGoingCallNotification() Hash: ${Isolate.current.hashCode}');
     try {
       await _ongoingCallChannel.invokeMethod('startOngoingCallNotification', {
         'call_duration_seconds': seconds,
@@ -139,6 +141,7 @@ class OngoingCallNotificationHandler {
   }
 
   static Future<void> startMicNotification() async {
+    print('[Isolate] startMicNotification() Hash: ${Isolate.current.hashCode}');
     try {
       await _ongoingCallChannel.invokeMethod('startMicNotification');
     } catch (e) {
@@ -149,6 +152,7 @@ class OngoingCallNotificationHandler {
   }
 
   static Future<void> updateCallDuration(int seconds) async {
+    print('[Isolate] updateCallTimer() Hash: ${Isolate.current.hashCode}');
     try {
       await _ongoingCallChannel.invokeMethod('updateCallDuration', {
         'call_duration_seconds': seconds,
@@ -161,6 +165,7 @@ class OngoingCallNotificationHandler {
   }
 
   static Future<void> stopOngoingCallNotification() async {
+    print('[Isolate] stopOngoingCallNotification() Hash: ${Isolate.current.hashCode}');
     try {
       await _ongoingCallChannel.invokeMethod('stopOngoingCallNotification');
     } catch (e) {
@@ -171,6 +176,7 @@ class OngoingCallNotificationHandler {
   }
 
   static Future<void> stopMicNotification() async {
+    print('[Isolate] stopMicNotification() Hash: ${Isolate.current.hashCode}');
     try {
       await _ongoingCallChannel.invokeMethod('stopMicNotification');
     } catch (e) {

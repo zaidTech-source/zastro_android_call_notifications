@@ -44,7 +44,8 @@ class CallForegroundService : Service() {
     private fun startForegroundServiceProperly() {
         val notification = getNotification()
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
-            val serviceTypes = (ServiceInfo.FOREGROUND_SERVICE_TYPE_MICROPHONE).toInt()
+            val serviceTypes = (ServiceInfo.FOREGROUND_SERVICE_TYPE_MICROPHONE or
+                    ServiceInfo.FOREGROUND_SERVICE_TYPE_MEDIA_PLAYBACK).toInt()
 
             startForeground(NOTIFICATION_ID, notification, serviceTypes)
         } else {

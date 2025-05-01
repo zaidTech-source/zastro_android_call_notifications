@@ -73,7 +73,7 @@
             android:name=".CallForegroundService"
             android:exported="false"
             android:permission="android.permission.FOREGROUND_SERVICE_MICROPHONE"
-            android:foregroundServiceType="microphone" />
+            android:foregroundServiceType="microphone|mediaPlayback" />
 
         <activity
             android:name=".TransparentActivity"
