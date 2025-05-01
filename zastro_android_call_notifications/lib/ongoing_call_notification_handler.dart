@@ -4,6 +4,7 @@ import 'dart:isolate';
 import 'package:flutter/foundation.dart';
 import 'package:android_intent_plus/android_intent.dart';
 import 'package:android_intent_plus/flag.dart';
+import 'package:flutter/scheduler.dart';
 import 'package:flutter/services.dart';
 
 class OngoingCallNotificationHandler {
@@ -128,6 +129,10 @@ class OngoingCallNotificationHandler {
 
 
   static Future<void> startOnGoingCallNotification(int seconds) async {
+    if (SchedulerBinding.instance?.schedulerPhase != SchedulerPhase.idle) {
+      print('[Isolate] Skipping native call - Engine not idle');
+      return;
+    }
     print('[Isolate] startOnGoingCallNotification() Hash: ${Isolate.current.hashCode}');
     try {
       await _ongoingCallChannel.invokeMethod('startOngoingCallNotification', {
@@ -141,6 +146,10 @@ class OngoingCallNotificationHandler {
   }
 
   static Future<void> startMicNotification() async {
+    if (SchedulerBinding.instance?.schedulerPhase != SchedulerPhase.idle) {
+      print('[Isolate] Skipping native call - Engine not idle');
+      return;
+    }
     print('[Isolate] startMicNotification() Hash: ${Isolate.current.hashCode}');
     try {
       await _ongoingCallChannel.invokeMethod('startMicNotification');
