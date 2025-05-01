@@ -35,8 +35,11 @@ class ZastroAndroidCallNotificationsPlugin : FlutterPlugin, MethodCallHandler, A
   private lateinit var callOngoingReceiver: CallOngoingTimeNotificationReceiver
   private var activity: Activity? = null
   private var latestNotificationData: Map<String, Any?>? = null
+  private var isAttachedToEngine = false
+
 
   override fun onAttachedToEngine(@NonNull binding: FlutterPlugin.FlutterPluginBinding) {
+    isAttachedToEngine = true
     Log.d("FlutterCallkitIncoming", "onAttachedToEngine called")
     context = binding.applicationContext
     channel = MethodChannel(binding.binaryMessenger, "Chat notifications")
@@ -307,6 +310,7 @@ class ZastroAndroidCallNotificationsPlugin : FlutterPlugin, MethodCallHandler, A
   }
 
   override fun onDetachedFromEngine(@NonNull binding: FlutterPlugin.FlutterPluginBinding) {
+    isAttachedToEngine = false
     Log.d("FlutterCallkitIncoming", "onDetachedFromEngine called")
     channel.setMethodCallHandler(null)
 //    callTimerChannel.setMethodCallHandler(null)
