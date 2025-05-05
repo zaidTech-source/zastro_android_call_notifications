@@ -49,6 +49,7 @@ class ZastroAndroidCallNotificationsPlugin : FlutterPlugin, MethodCallHandler, A
 
     override fun onAttachedToEngine(@NonNull binding: FlutterPlugin.FlutterPluginBinding) {
         Log.d("FlutterCallkitIncoming", "onAttachedToEngine called")
+        context = binding.applicationContext
         flutterPluginBinding = binding
 
         if (!isInitialized) {
