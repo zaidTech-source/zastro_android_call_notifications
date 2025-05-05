@@ -39,11 +39,10 @@ class ZastroAndroidCallNotificationsPlugin : FlutterPlugin, MethodCallHandler, A
     private var activity: Activity? = null
     private var latestNotificationData: Map<String, Any?>? = null
 
-    private var flutterPluginBinding: FlutterPlugin.FlutterPluginBinding? = null
 
     companion object {
         private lateinit var channel: MethodChannel
-        private var isInitialized = false
+    private var flutterPluginBinding: FlutterPlugin.FlutterPluginBinding? = null
     }
 
 
@@ -52,9 +51,8 @@ class ZastroAndroidCallNotificationsPlugin : FlutterPlugin, MethodCallHandler, A
         context = binding.applicationContext
         flutterPluginBinding = binding
 
-        if (!isInitialized) {
+        if (!channel) {
             initPlugin(binding.binaryMessenger)
-            isInitialized = true
         }
         /*context = binding.applicationContext
         channel = MethodChannel(binding.binaryMessenger, "Chat notifications")
@@ -311,8 +309,6 @@ class ZastroAndroidCallNotificationsPlugin : FlutterPlugin, MethodCallHandler, A
     }
 
     override fun onDetachedFromEngine(@NonNull binding: FlutterPlugin.FlutterPluginBinding) {
-        channel.setMethodCallHandler(null)
-        isInitialized = false
 //        Log.d("FlutterCallkitIncoming", "onDetachedFromEngine called")
 //        channel.setMethodCallHandler(null)
 ////    callTimerChannel.setMethodCallHandler(null)
