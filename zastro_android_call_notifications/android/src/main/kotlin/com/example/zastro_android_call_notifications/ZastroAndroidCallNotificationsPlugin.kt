@@ -23,6 +23,8 @@ import io.flutter.plugin.common.MethodChannel.Result
 import org.json.JSONObject
 import android.content.BroadcastReceiver
 import android.content.IntentFilter
+import io.flutter.plugin.common.BinaryMessenger
+
 
 
 class ZastroAndroidCallNotificationsPlugin : FlutterPlugin, MethodCallHandler, ActivityAware {
@@ -308,7 +310,7 @@ class ZastroAndroidCallNotificationsPlugin : FlutterPlugin, MethodCallHandler, A
     }
 
     override fun onDetachedFromEngine(@NonNull binding: FlutterPlugin.FlutterPluginBinding) {
-        methodChannel.setMethodCallHandler(null)
+        channel.setMethodCallHandler(null)
         isInitialized = false
 //        Log.d("FlutterCallkitIncoming", "onDetachedFromEngine called")
 //        channel.setMethodCallHandler(null)
