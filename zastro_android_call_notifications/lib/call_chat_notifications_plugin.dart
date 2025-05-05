@@ -1,7 +1,4 @@
 import 'package:flutter/services.dart';
-import 'dart:convert';
-import 'package:android_intent_plus/android_intent.dart';
-import 'package:android_intent_plus/flag.dart';
 import 'package:flutter/foundation.dart';
 
 import 'notification_storage_helper.dart';
@@ -82,9 +79,9 @@ class ChatNotificationPlugin {
 
   static Future<void> triggerBroadcastNotification(String messageDataJson) async {
     try {
-      print("🚀 Sending JSON to Kotlin: $messageDataJson");
+      print("Sending JSON to Kotlin: $messageDataJson");
       await _channel.invokeMethod('triggerBroadcastNotification', {'message_data_in_string': messageDataJson});
-      print("🚀 Sent JSON to Kotlin: $messageDataJson");
+      print("Sent JSON to Kotlin: $messageDataJson");
     } on PlatformException catch (e) {
       print("Error invoking triggerBroadcastNotification: ${e.message}");
     }
