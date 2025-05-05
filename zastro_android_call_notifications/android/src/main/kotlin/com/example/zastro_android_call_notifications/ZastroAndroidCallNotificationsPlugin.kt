@@ -51,7 +51,7 @@ class ZastroAndroidCallNotificationsPlugin : FlutterPlugin, MethodCallHandler, A
         context = binding.applicationContext
         flutterPluginBinding = binding
 
-        if (!channel) {
+        if (channel != null) {
             initPlugin(binding.binaryMessenger)
         }
         /*context = binding.applicationContext
