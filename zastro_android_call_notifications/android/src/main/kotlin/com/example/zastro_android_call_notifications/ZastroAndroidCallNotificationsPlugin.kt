@@ -70,7 +70,7 @@ class ZastroAndroidCallNotificationsPlugin : FlutterPlugin, MethodCallHandler, A
 
 
     private fun initPlugin(binaryMessenger: BinaryMessenger) {
-        channel = MethodChannel(binaryMessenger, "my_channel")
+        channel = MethodChannel(binaryMessenger, "Chat notifications")
         channel.setMethodCallHandler(this)
     }
 
