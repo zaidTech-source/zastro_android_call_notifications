@@ -37,9 +37,7 @@ class CallForegroundService : Service() {
         return NotificationCompat.Builder(this, CHANNEL_ID)
             .setSmallIcon(R.drawable.ic_ongoing_call)
             .setPriority(NotificationCompat.PRIORITY_HIGH)
-//            .setCategory(NotificationCompat.CATEGORY_SERVICE)
-            .setCategory(NotificationCompat.CATEGORY_CALL)
-            .setOngoing(true)
+            .setCategory(NotificationCompat.CATEGORY_SERVICE)
             .build()
     }
 
