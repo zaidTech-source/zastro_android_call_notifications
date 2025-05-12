@@ -53,6 +53,7 @@ class ZastroAndroidCallNotificationsPlugin : FlutterPlugin, MethodCallHandler, A
 //    ongoingCallChannel.setMethodCallHandler(this)
 
         MethodChannelHelper.setMethodChannel(channel)
+        checkAndResumeCallNotification()
     }
 
     override fun onMethodCall(@NonNull call: MethodCall, @NonNull result: Result) {
@@ -145,6 +146,7 @@ class ZastroAndroidCallNotificationsPlugin : FlutterPlugin, MethodCallHandler, A
 
                 "startOngoingCallNotification" -> {
                     val seconds = call.argument<Int>("call_duration_seconds") ?: 0
+                    saveCallTimerState(seconds)
                     try {
                         val intent =
                             Intent("${context.packageName}.com.example.zastro_android_call_notifications.START_CALL_NOTIFICATION").apply {
@@ -174,6 +176,7 @@ class ZastroAndroidCallNotificationsPlugin : FlutterPlugin, MethodCallHandler, A
 
                 "updateCallDuration" -> {
                     val seconds = call.argument<Int>("call_duration_seconds") ?: 0
+                    saveCallTimerState(seconds)
                     try {
                         val intent =
                             Intent("${context.packageName}.com.example.zastro_android_call_notifications.UPDATE_CALL_NOTIFICATION").apply {
@@ -190,6 +193,7 @@ class ZastroAndroidCallNotificationsPlugin : FlutterPlugin, MethodCallHandler, A
                 }
 
                 "stopOngoingCallNotification" -> {
+                    clearCallTimerState()
                     val intent =
                         Intent("${context.packageName}.com.example.zastro_android_call_notifications.STOP_CALL_NOTIFICATION")
                     intent.setPackage(context.packageName)
@@ -244,6 +248,7 @@ class ZastroAndroidCallNotificationsPlugin : FlutterPlugin, MethodCallHandler, A
             handleIntent(intent)
             true
         }
+        checkAndResumeCallNotification()
         handleIntent(binding.activity.intent)
 
         /*// Register all broadcast receivers
@@ -350,4 +355,36 @@ class ZastroAndroidCallNotificationsPlugin : FlutterPlugin, MethodCallHandler, A
 //    callTimerChannel.setMethodCallHandler(null)
 //    ongoingCallChannel.setMethodCallHandler(null)
     }
+
+
+    private fun saveCallTimerState(seconds: Int) {
+        val prefs = context.getSharedPreferences("call_timer_prefs", Context.MODE_PRIVATE)
+        prefs.edit().apply {
+            putBoolean("is_call_ongoing", true)
+            putLong("call_start_time", System.currentTimeMillis() - (seconds * 1000))
+            apply()
+        }
+    }
+
+    private fun clearCallTimerState() {
+        val prefs = context.getSharedPreferences("call_timer_prefs", Context.MODE_PRIVATE)
+        prefs.edit().clear().apply()
+    }
+
+    private fun checkAndResumeCallNotification() {
+        val prefs = context.getSharedPreferences("call_timer_prefs", Context.MODE_PRIVATE)
+        val isOngoing = prefs.getBoolean("is_call_ongoing", false)
+        val startTime = prefs.getLong("call_start_time", 0L)
+
+        if (isOngoing && startTime > 0) {
+            val elapsedSeconds = ((System.currentTimeMillis() - startTime) / 1000).toInt()
+
+            val resumeIntent = Intent("${context.packageName}.com.example.zastro_android_call_notifications.START_CALL_NOTIFICATION").apply {
+                putExtra("call_duration_seconds", elapsedSeconds)
+            }
+            context.sendBroadcast(resumeIntent)
+        }
+    }
+
+
 }
