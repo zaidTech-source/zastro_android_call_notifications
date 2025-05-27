@@ -73,6 +73,16 @@ class CallBackgroundExecutor : MethodChannel.MethodCallHandler {
         channel?.invokeMethod("onMicToggled", listOf(isMuted))
     }
 
+    fun setCallbackDispatcher(context: Context, handle: Long) {
+        val prefs = context.getSharedPreferences("call_callback_prefs", Context.MODE_PRIVATE)
+        prefs.edit().putLong("callback_dispatcher_handle", handle).apply()
+    }
+    fun getCallbackDispatcher(context: Context): Long {
+        val prefs = context.getSharedPreferences("call_callback_prefs", Context.MODE_PRIVATE)
+        return prefs.getLong("callback_dispatcher_handle", 0L)
+    }
+
+
     override fun onMethodCall(call: MethodCall, result: MethodChannel.Result) {
         if (call.method == "BackgroundExecutor.initialized") {
             isInitialized.set(true)
