@@ -1,23 +1,16 @@
 import 'package:flutter/services.dart';
 
 void callCallbackDispatcher() {
-  const MethodChannel backgroundChannel = MethodChannel('com.zastro/call_background');
+  const MethodChannel _backgroundChannel = MethodChannel('Chat notifications');
 
-  backgroundChannel.setMethodCallHandler((call) async {
-    switch (call.method) {
-      case 'onCallTimerTick':
-        final seconds = call.arguments[0];
-        print('Timer tick: $seconds seconds');
-        break;
-      case 'onCallEnded':
-        print('Call ended');
-        break;
-      case 'onMicToggled':
-        final isMuted = call.arguments[0];
-        print('Mic muted: $isMuted');
-        break;
+  // Optional: Set a method call handler if you expect background calls from Kotlin
+  _backgroundChannel.setMethodCallHandler((call) async {
+    if (call.method == "callTick") {
+      final int seconds = call.arguments;
+      print("Tick in background isolate: $seconds seconds");
+    } else if (call.method == "muteToggled") {
+      final bool isMuted = call.arguments;
+      print("Mic is now ${isMuted ? "muted" : "unmuted"}");
     }
   });
-
-  backgroundChannel.invokeMethod('BackgroundExecutor.initialized');
 }
