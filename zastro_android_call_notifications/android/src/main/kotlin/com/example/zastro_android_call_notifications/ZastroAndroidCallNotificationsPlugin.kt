@@ -144,14 +144,26 @@ class ZastroAndroidCallNotificationsPlugin : FlutterPlugin, MethodCallHandler, A
                     result.success("Data received successfully!")
                 }
 
+                "setCallDispatcherHandle" -> {
+                    val handle = (call.argument<Number>("handle") ?: 0).toLong()
+                    CallBackgroundExecutor.getInstance().setCallbackDispatcher(context, handle)
+                    result.success(null)
+                }
+
                 "startOngoingCallNotification" -> {
                     val seconds = call.argument<Int>("call_duration_seconds") ?: 0
                     saveCallTimerState(seconds)
+
+                    // Start Dart isolate (if not running)
+                    CallBackgroundExecutor.getInstance().startIsolate(context)
+
+                    // Optionally send initial tick
+                    CallBackgroundExecutor.getInstance().sendCallTick(seconds)
+
                     try {
-                        val intent =
-                            Intent("${context.packageName}.com.example.zastro_android_call_notifications.START_CALL_NOTIFICATION").apply {
-                                putExtra("call_duration_seconds", seconds)
-                            }
+                        val intent = Intent("${context.packageName}.com.example.zastro_android_call_notifications.START_CALL_NOTIFICATION").apply {
+                            putExtra("call_duration_seconds", seconds)
+                        }
                         intent.setPackage(context.packageName)
                         context.sendBroadcast(intent)
                         result.success("START_CALL_NOTIFICATION broadcast sent!")
@@ -161,10 +173,16 @@ class ZastroAndroidCallNotificationsPlugin : FlutterPlugin, MethodCallHandler, A
                     }
                 }
 
+
                 "startMicNotification" -> {
+                    // Start isolate if needed
+                    CallBackgroundExecutor.getInstance().startIsolate(context)
+
+                    // Optional: notify Dart that mic is active (not muted)
+                    CallBackgroundExecutor.getInstance().sendMuteToggled(false)
+
                     try {
-                        val intent =
-                            Intent("${context.packageName}.com.example.zastro_android_call_notifications.START_MICROPHONE_NOTIFICATION")
+                        val intent = Intent("${context.packageName}.com.example.zastro_android_call_notifications.START_MICROPHONE_NOTIFICATION")
                         intent.setPackage(context.packageName)
                         context.sendBroadcast(intent)
                         result.success("START_MICROPHONE_NOTIFICATION broadcast sent!")
@@ -174,14 +192,18 @@ class ZastroAndroidCallNotificationsPlugin : FlutterPlugin, MethodCallHandler, A
                     }
                 }
 
+
                 "updateCallDuration" -> {
                     val seconds = call.argument<Int>("call_duration_seconds") ?: 0
                     saveCallTimerState(seconds)
+
+                    // Also send to Dart
+                    CallBackgroundExecutor.getInstance().sendCallTick(seconds)
+
                     try {
-                        val intent =
-                            Intent("${context.packageName}.com.example.zastro_android_call_notifications.UPDATE_CALL_NOTIFICATION").apply {
-                                putExtra("call_duration_seconds", seconds)
-                            }
+                        val intent = Intent("${context.packageName}.com.example.zastro_android_call_notifications.UPDATE_CALL_NOTIFICATION").apply {
+                            putExtra("call_duration_seconds", seconds)
+                        }
                         intent.setPackage(context.packageName)
                         context.sendBroadcast(intent)
                         result.success("UPDATE_CALL_NOTIFICATION broadcast sent!")
@@ -189,25 +211,32 @@ class ZastroAndroidCallNotificationsPlugin : FlutterPlugin, MethodCallHandler, A
                         println("Broadcast failed: ${e.message}")
                         result.error("BROADCAST_ERROR", e.message, null)
                     }
-
                 }
+
 
                 "stopOngoingCallNotification" -> {
                     clearCallTimerState()
-                    val intent =
-                        Intent("${context.packageName}.com.example.zastro_android_call_notifications.STOP_CALL_NOTIFICATION")
+
+                    // Notify Dart
+                    CallBackgroundExecutor.getInstance().sendCallEnded()
+
+                    val intent = Intent("${context.packageName}.com.example.zastro_android_call_notifications.STOP_CALL_NOTIFICATION")
                     intent.setPackage(context.packageName)
                     context.sendBroadcast(intent)
                     result.success("STOP_CALL_NOTIFICATION broadcast sent!")
                 }
 
+
                 "stopMicNotification" -> {
-                    val intent =
-                        Intent("${context.packageName}.com.example.zastro_android_call_notifications.STOP_MIC_NOTIFICATION")
+                    // Notify Dart mic is stopped (assumed muted)
+                    CallBackgroundExecutor.getInstance().sendMuteToggled(true)
+
+                    val intent = Intent("${context.packageName}.com.example.zastro_android_call_notifications.STOP_MIC_NOTIFICATION")
                     intent.setPackage(context.packageName)
                     context.sendBroadcast(intent)
                     result.success("STOP_MIC_NOTIFICATION broadcast sent!")
                 }
+
 
                 else -> result.notImplemented()
             }
